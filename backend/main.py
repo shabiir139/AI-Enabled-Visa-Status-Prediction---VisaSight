@@ -54,7 +54,11 @@ frontend_url = os.getenv("FRONTEND_URL")
 if frontend_url:
     allowed_origins.append(frontend_url)
 
-# Add Vercel preview and production URLs
+# Add Vercel production URL
+vercel_prod_url = "https://ai-enabled-visa-status-prediction-visa-sight-fronten-eosfatc1l.vercel.app"
+allowed_origins.append(vercel_prod_url)
+
+# Add Vercel preview URLs from environment
 vercel_url = os.getenv("VERCEL_URL")
 if vercel_url:
     allowed_origins.append(f"https://{vercel_url}")
