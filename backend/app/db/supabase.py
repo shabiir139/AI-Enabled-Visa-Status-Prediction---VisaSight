@@ -31,7 +31,12 @@ def get_supabase() -> Client:
     try:
         if not SUPABASE_URL or not SUPABASE_KEY:
             raise ValueError("Supabase URL and Key must be configured")
-        return create_client(SUPABASE_URL, SUPABASE_KEY)
+            
+        # Initialize without extra arguments to avoid 'proxy' error in some environments
+        return create_client(
+            supabase_url=SUPABASE_URL, 
+            supabase_key=SUPABASE_KEY
+        )
     except Exception as e:
         print(f"❌ Failed to connect to Supabase: {e}")
         # In production, we might want to exit, but for now we'll allow startup

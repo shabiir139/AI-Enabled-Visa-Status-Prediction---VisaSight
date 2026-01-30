@@ -5,7 +5,7 @@ Pydantic Models for VisaSight API
 from datetime import datetime, date
 from typing import Optional, List, Dict, Any
 from enum import Enum
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 import uuid
 
 
@@ -76,12 +76,16 @@ class ExplanationFactor(BaseModel):
 
 
 class PredictionExplanation(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+    
     top_factors: List[ExplanationFactor]
     feature_importance: Dict[str, float]
     model_confidence: float
 
 
 class PredictionResult(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+    
     id: str
     visa_case_id: str
     predicted_status: StatusProbabilities
