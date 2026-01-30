@@ -41,8 +41,6 @@ export default function LiveWaitTimeFeed() {
         return () => clearInterval(interval);
     }, []);
 
-    if (loading && data.length === 0) return null;
-
     return (
         <div className={styles.wrapper}>
             <div className={styles.label}>
@@ -50,18 +48,22 @@ export default function LiveWaitTimeFeed() {
                 LIVE WAIT TIMES
             </div>
             <div className={styles.tickerContainer}>
-                <div className={styles.tickerContent}>
-                    {/* Double the data for seamless looping */}
-                    {[...data, ...data].map((item, idx) => (
-                        <div key={`${item.consulate}-${item.visa_type}-${idx}`} className={styles.item}>
-                            <span className={styles.city}>{item.consulate}</span>
-                            <span className={styles.type}>{item.visa_type}</span>
-                            <span className={`${styles.days} ${item.wait_days > 100 ? styles.high : item.wait_days > 30 ? styles.mid : styles.low}`}>
-                                {item.wait_days}d
-                            </span>
-                        </div>
-                    ))}
-                </div>
+                {loading && data.length === 0 ? (
+                    <div className={styles.loadingTicker}>Connecting to visa wait time data...</div>
+                ) : (
+                    <div className={styles.tickerContent}>
+                        {/* Double the data for seamless looping */}
+                        {[...data, ...data].map((item, idx) => (
+                            <div key={`${item.consulate}-${item.visa_type}-${idx}`} className={styles.item}>
+                                <span className={styles.city}>{item.consulate}</span>
+                                <span className={styles.type}>{item.visa_type}</span>
+                                <span className={`${styles.days} ${item.wait_days > 100 ? styles.high : item.wait_days > 30 ? styles.mid : styles.low}`}>
+                                    {item.wait_days}d
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

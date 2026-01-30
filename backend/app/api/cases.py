@@ -43,8 +43,8 @@ async def create_visa_case(
     user_id = get_user_id_from_token(authorization)
     
     if not user_id:
-        # Demo mode - create case without user
-        user_id = "demo-user"
+        # Demo mode - create case without user (nullable in DB)
+        user_id = None
     
     try:
         data = {

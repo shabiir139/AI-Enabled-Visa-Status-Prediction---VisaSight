@@ -1,5 +1,6 @@
 .card {
     display: flex;
+    align-items: center;
     gap: var(--space-4);
     padding: var(--space-5);
     background: var(--surface-glass);
