@@ -13,19 +13,22 @@ from app.api import cases, predict, rules, dashboard, models, external
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan events."""
-    # Startup: Load ML models
-    print("🚀 VisaSight API starting up...")
-    print("📊 Pre-loading ML models for better performance...")
+    import os
+    model_type = os.getenv("MODEL_TYPE", "mock")
+    low_memory = os.getenv("LOW_MEMORY_MODE", "false").lower() == "true"
     
-    # Pre-warm the predictor
-    from app.ml.predictor import get_predictor
-    # Initialize both mock and baseline to warm up caches
-    get_predictor("mock").load_models()
-    try:
-        get_predictor("baseline").load_models()
-        print("✅ Models loaded and ready.")
-    except Exception as e:
-        print(f"⚠️ Warning: Could not pre-load baseline models: {e}")
+    print(f"🚀 VisaSight API starting up (Mode: {model_type})...")
+    
+    if low_memory:
+        print("💡 Low memory mode enabled - skipping heavy model pre-loading")
+    else:
+        print(f"📊 Pre-loading {model_type} models...")
+        from app.ml.predictor import get_predictor
+        try:
+            get_predictor(model_type).load_models()
+            print(f"✅ {model_type.capitalize()} models loaded and ready.")
+        except Exception as e:
+            print(f"⚠️ Warning: Could not pre-load {model_type} models: {e}")
         
     yield
     # Shutdown

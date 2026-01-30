@@ -452,13 +452,20 @@ class VisaPredictor:
 _predictors: Dict[str, VisaPredictor] = {}
 
 
-def get_predictor(model_type: str = "mock") -> VisaPredictor:
+def get_predictor(model_type: Optional[str] = None) -> VisaPredictor:
     """Get or create global predictor instance from cache."""
     global _predictors
     
+    # If no type provided, check environment or default to mock
+    if model_type is None:
+        model_type = os.getenv("MODEL_TYPE", "mock")
+    
     if model_type not in _predictors:
         predictor = VisaPredictor(model_type=model_type)
-        predictor.load_models()
+        # Only load if not in low memory mode during startup, 
+        # otherwise load on first prediction
+        if os.getenv("LOW_MEMORY_MODE", "false").lower() != "true":
+            predictor.load_models()
         _predictors[model_type] = predictor
     
     return _predictors[model_type]
