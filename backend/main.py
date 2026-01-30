@@ -45,15 +45,24 @@ allowed_origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
 # Add production frontend URL if set
 frontend_url = os.getenv("FRONTEND_URL")
 if frontend_url:
     allowed_origins.append(frontend_url)
-# Add Vercel preview URLs
+
+# Add Vercel preview and production URLs
 vercel_url = os.getenv("VERCEL_URL")
 if vercel_url:
     allowed_origins.append(f"https://{vercel_url}")
-    
+    # Also add the root domain if it's a vercel URL
+    if ".vercel.app" in vercel_url:
+        root_domain = vercel_url.split(".vercel.app")[0]
+        allowed_origins.append(f"https://{root_domain}.vercel.app")
+        
+# Allow all Vercel domains for development/preview flexibility (Optional, depends on security needs)
+# allowed_origins.append("https://*.vercel.app")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,

@@ -3,5 +3,15 @@
     "framework": "nextjs",
     "buildCommand": "npm run build",
     "installCommand": "npm install",
-    "outputDirectory": ".next"
+    "outputDirectory": ".next",
+    "rewrites": [
+        {
+            "source": "/api/:path*",
+            "destination": "https://visasight-backend.up.railway.app/api/:path*"
+        },
+        {
+            "source": "/health",
+            "destination": "https://visasight-backend.up.railway.app/health"
+        }
+    ]
 }
