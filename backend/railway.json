@@ -3,8 +3,9 @@
         "builder": "NIXPACKS"
     },
     "deploy": {
-        "startCommand": "python -m uvicorn main:app --host 0.0.0.0 --port $PORT",
+        "startCommand": "export PYTHONPATH=$PYTHONPATH:. && . /app/.venv/bin/activate && python3 -m uvicorn main:app --host 0.0.0.0 --port $PORT --log-level debug",
         "healthcheckPath": "/health",
-        "healthcheckTimeout": 600
+        "healthcheckTimeout": 300,
+        "restartPolicyType": "ON_FAILURE"
     }
 }
