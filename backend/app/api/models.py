@@ -7,7 +7,7 @@ List, switch, and manage ML model versions.
 from fastapi import APIRouter, HTTPException
 from typing import List, Optional
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 import json
 from pathlib import Path
 
@@ -16,6 +16,8 @@ router = APIRouter()
 
 class ModelInfo(BaseModel):
     """Information about a model version."""
+    model_config = ConfigDict(protected_namespaces=())
+    
     name: str
     version: str
     type: str  # baseline, hf, mock
@@ -26,6 +28,8 @@ class ModelInfo(BaseModel):
 
 class ModelSwitchRequest(BaseModel):
     """Request to switch active model."""
+    model_config = ConfigDict(protected_namespaces=())
+    
     model_type: str  # mock, baseline, hf
 
 

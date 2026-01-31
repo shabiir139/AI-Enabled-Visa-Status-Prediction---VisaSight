@@ -63,6 +63,7 @@ class VisaCaseResponse(BaseModel):
 
 # Prediction Models
 class StatusProbabilities(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
     approved: float
     rfe: float
     denied: float

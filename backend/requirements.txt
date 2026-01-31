@@ -11,7 +11,7 @@ pydantic==2.5.3
 pydantic-settings==2.1.0
 
 # Database
-supabase==2.3.0
+supabase==2.11.0
 python-dotenv==1.0.0
 
 # ML Libraries

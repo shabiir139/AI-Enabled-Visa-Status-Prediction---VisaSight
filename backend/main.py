@@ -67,12 +67,14 @@ if vercel_url:
         root_domain = vercel_url.split(".vercel.app")[0]
         allowed_origins.append(f"https://{root_domain}.vercel.app")
         
-# Allow all Vercel domains for development/preview flexibility (Optional, depends on security needs)
-# allowed_origins.append("https://*.vercel.app")
+# Allow all Vercel domains for development/preview flexibility
+# This is safe for public APIs, adjust carefully for private ones
+allowed_origins.append("https://*.vercel.app")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
+    allow_origin_regex="https://.*\\.vercel\\.app", # Support for Vercel preview URLs
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -101,8 +103,12 @@ async def root():
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
-    print("💓 Health check requested")
-    return {"status": "healthy"}
+    print("💓 Health check requested - Status: Healthy")
+    return {
+        "status": "healthy",
+        "timestamp": datetime.utcnow().isoformat(),
+        "mode": os.getenv("MODEL_TYPE", "unknown")
+    }
 
 
 if __name__ == "__main__":
