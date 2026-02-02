@@ -3,7 +3,7 @@
 ## AI-Enabled Visa Status Prediction & Processing Time Estimator
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](/)
-[![Next.js](https://img.shields.io/badge/Next.js-14.2.0-black)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-14.2.23-black)](https://nextjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.109.0-009688)](https://fastapi.tiangolo.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Connected-3FCF8E)](https://supabase.com/)
 
@@ -52,7 +52,7 @@ visasight/
 ├── backend/                     # FastAPI Python Backend
 │   ├── app/
 │   │   ├── api/                 # API endpoints
-│   │   ├── ml/                  # ML models
+│   │   ├── ml_core/             # ML models (moved from root for deployment)
 │   │   ├── services/            # Business logic
 │   │   └── models/              # Data models
 │   ├── main.py                  # Entry point
