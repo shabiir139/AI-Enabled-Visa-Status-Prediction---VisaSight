@@ -91,7 +91,10 @@ export async function apiRequest<T>(
     endpoint: string,
     options: RequestInit = {}
 ): Promise<T> {
-    const url = `${API_BASE}${endpoint}`;
+    // Remove trailing slash from base if present, and leading slash from endpoint if present
+    const cleanBase = API_BASE.replace(/\/$/, '');
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const url = `${cleanBase}${cleanEndpoint}`;
 
     const config: RequestInit = {
         ...options,
