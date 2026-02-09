@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api';
 import styles from './ModelSelector.module.css';
 
@@ -18,23 +18,38 @@ export default function ModelSelector() {
     const [loading, setLoading] = useState(true);
     const [switching, setSwitching] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [retryCount, setRetryCount] = useState(0);
+
+    const fetchModels = useCallback(async (isRetry = false) => {
+        setError(null);
+        if (!isRetry) setLoading(true);
+
+        try {
+            const data = await api.models.list();
+            setModels(data);
+            setRetryCount(0);
+        } catch (err) {
+            console.error('Failed to fetch models:', err);
+
+            // Auto-retry up to 3 times for cold starts
+            if (retryCount < 3) {
+                setRetryCount(prev => prev + 1);
+                setError(`Connecting to server... (attempt ${retryCount + 1}/3)`);
+                setTimeout(() => fetchModels(true), 2000);
+                return;
+            }
+
+            setError('Failed to load models. Make sure the backend is running.');
+        } finally {
+            if (!isRetry || retryCount >= 3) {
+                setLoading(false);
+            }
+        }
+    }, [retryCount]);
 
     useEffect(() => {
         fetchModels();
     }, []);
-
-    const fetchModels = async () => {
-        setError(null);
-        try {
-            const data = await api.models.list();
-            setModels(data);
-        } catch (err) {
-            console.error('Failed to fetch models:', err);
-            setError('Failed to load models. Make sure the backend is running.');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const switchModel = async (modelType: string) => {
         setSwitching(true);
@@ -55,7 +70,7 @@ export default function ModelSelector() {
             <div className={styles.container}>
                 <div className={styles.loading}>
                     <div className={styles.loadingSpinner}></div>
-                    <span>Loading models...</span>
+                    <span>{retryCount > 0 ? `Connecting to server... (attempt ${retryCount}/3)` : 'Loading models...'}</span>
                 </div>
             </div>
         );
@@ -67,7 +82,7 @@ export default function ModelSelector() {
                 <div className={styles.error}>
                     <span>⚠️</span>
                     <span>{error}</span>
-                    <button onClick={fetchModels} className={styles.retryBtn}>
+                    <button onClick={() => { setRetryCount(0); fetchModels(); }} className={styles.retryBtn}>
                         Retry
                     </button>
                 </div>
