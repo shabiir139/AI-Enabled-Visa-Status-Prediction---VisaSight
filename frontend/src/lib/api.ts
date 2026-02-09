@@ -84,14 +84,80 @@ export function getMockPrediction() {
     };
 }
 
+// ============================================
+// Connection State Management
+// ============================================
+
+type ConnectionState = 'connected' | 'connecting' | 'disconnected';
+type ConnectionListener = (state: ConnectionState) => void;
+
+class ConnectionManager {
+    private state: ConnectionState = 'disconnected';
+    private listeners: Set<ConnectionListener> = new Set();
+    private keepaliveInterval: NodeJS.Timeout | null = null;
+    private lastSuccessfulRequest: number = 0;
+
+    getState(): ConnectionState {
+        return this.state;
+    }
+
+    setState(state: ConnectionState) {
+        if (this.state !== state) {
+            this.state = state;
+            this.listeners.forEach(listener => listener(state));
+        }
+    }
+
+    subscribe(listener: ConnectionListener): () => void {
+        this.listeners.add(listener);
+        // Immediately notify with current state
+        listener(this.state);
+        return () => this.listeners.delete(listener);
+    }
+
+    markSuccess() {
+        this.lastSuccessfulRequest = Date.now();
+        this.setState('connected');
+    }
+
+    // Start keepalive pings to prevent cold starts
+    startKeepalive(pingFn: () => Promise<void>, intervalMs = 4 * 60 * 1000) {
+        if (this.keepaliveInterval) return;
+
+        this.keepaliveInterval = setInterval(async () => {
+            try {
+                await pingFn();
+                this.markSuccess();
+            } catch {
+                // Silent fail for keepalive
+            }
+        }, intervalMs);
+    }
+
+    stopKeepalive() {
+        if (this.keepaliveInterval) {
+            clearInterval(this.keepaliveInterval);
+            this.keepaliveInterval = null;
+        }
+    }
+}
+
+export const connectionManager = new ConnectionManager();
+
+// ============================================
+// API Request with Retry Logic
+// ============================================
+
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 /**
- * Make an API request to the backend
+ * Make an API request to the backend with automatic retry for cold starts
  */
 export async function apiRequest<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    retryConfig = { maxRetries: 3, baseDelayMs: 2000 }
 ): Promise<T> {
-    // Remove trailing slash from base if present, and leading slash from endpoint if present
     const cleanBase = API_BASE.replace(/\/$/, '');
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
     const url = `${cleanBase}${cleanEndpoint}`;
@@ -104,14 +170,58 @@ export async function apiRequest<T>(
         },
     };
 
-    const response = await fetch(url, config);
+    let lastError: Error = new Error('Request failed');
 
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'Request failed' }));
-        throw new Error(error.detail || `HTTP ${response.status}`);
+    for (let attempt = 0; attempt <= retryConfig.maxRetries; attempt++) {
+        try {
+            // Update state on first attempt
+            if (attempt === 0 && connectionManager.getState() === 'disconnected') {
+                connectionManager.setState('connecting');
+            }
+
+            const response = await fetch(url, config);
+
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({ detail: 'Request failed' }));
+                throw new Error(error.detail || `HTTP ${response.status}`);
+            }
+
+            // Success! Mark as connected
+            connectionManager.markSuccess();
+            return response.json();
+        } catch (error) {
+            lastError = error instanceof Error ? error : new Error(String(error));
+
+            // Check if we should retry
+            const isNetworkError = lastError.message.includes('fetch') ||
+                lastError.message.includes('network') ||
+                lastError.message.includes('Failed to fetch');
+            const isServerError = lastError.message.includes('5');
+
+            if (attempt < retryConfig.maxRetries && (isNetworkError || isServerError)) {
+                // Exponential backoff
+                const delayMs = retryConfig.baseDelayMs * Math.pow(1.5, attempt);
+                console.log(`[API] Retry ${attempt + 1}/${retryConfig.maxRetries} for ${endpoint} in ${delayMs}ms...`);
+                await delay(delayMs);
+                continue;
+            }
+
+            // No more retries
+            connectionManager.setState('disconnected');
+            throw lastError;
+        }
     }
 
-    return response.json();
+    throw lastError;
+}
+
+// Start keepalive when module loads (browser only)
+if (typeof window !== 'undefined') {
+    // Ping the health endpoint every 4 minutes to prevent Railway cold starts
+    connectionManager.startKeepalive(async () => {
+        const cleanBase = API_BASE.replace(/\/$/, '');
+        await fetch(`${cleanBase}/health`, { method: 'GET' });
+    });
 }
 
 /**

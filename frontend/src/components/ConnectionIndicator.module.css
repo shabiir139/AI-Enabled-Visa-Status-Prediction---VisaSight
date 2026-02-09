@@ -1,0 +1,99 @@
+.indicator {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    z-index: 1000;
+    animation: slideDown 0.3s ease-out;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+/* Connecting state - amber/orange */
+.connecting {
+    background: rgba(255, 193, 7, 0.15);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    color: #d4a000;
+}
+
+.connecting .dot {
+    background: #ffc107;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(0.8);
+    }
+}
+
+/* Disconnected state - red */
+.disconnected {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #dc2626;
+}
+
+.disconnected .dot {
+    background: #ef4444;
+}
+
+.text {
+    white-space: nowrap;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .connecting {
+        background: rgba(255, 193, 7, 0.1);
+        color: #fbbf24;
+    }
+
+    .disconnected {
+        background: rgba(239, 68, 68, 0.1);
+        color: #f87171;
+    }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+    .indicator {
+        left: 16px;
+        right: 16px;
+        transform: none;
+        justify-content: center;
+    }
+}

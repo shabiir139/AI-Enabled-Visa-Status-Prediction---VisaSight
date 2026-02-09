@@ -19,26 +19,47 @@ export default function SettingsPage() {
         checkHealth();
     }, []);
 
+    // Helper function to delay between retries
+    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+    // Helper function to attempt an API call with retries
+    const withRetry = async <T,>(
+        fn: () => Promise<T>,
+        retries = 3,
+        delayMs = 2000
+    ): Promise<T> => {
+        for (let i = 0; i < retries; i++) {
+            try {
+                return await fn();
+            } catch (error) {
+                if (i === retries - 1) throw error;
+                console.log(`Retry ${i + 1}/${retries} - Backend may be waking up...`);
+                await delay(delayMs);
+            }
+        }
+        throw new Error('All retries failed');
+    };
+
     const checkHealth = async () => {
         setChecking(true);
         try {
-            // Check API health
-            const apiHealth = await api.health();
+            // Check API health with retries (handles Railway cold starts)
+            const apiHealth = await withRetry(() => api.health(), 3, 2000);
             const apiOk = apiHealth.status === 'operational' || apiHealth.status === 'healthy';
 
-            // Check models
+            // Check models with retries
             let modelsOk = false;
             try {
-                const models = await api.models.list();
+                const models = await withRetry(() => api.models.list(), 2, 1500);
                 modelsOk = Array.isArray(models) && models.length > 0;
             } catch {
                 modelsOk = false;
             }
 
-            // Check database by trying to fetch rules
+            // Check database by trying to fetch rules with retries
             let dbOk = false;
             try {
-                const rules = await api.rules.list();
+                const rules = await withRetry(() => api.rules.list(), 2, 1500);
                 dbOk = rules.total >= 0;
             } catch {
                 dbOk = false;
@@ -50,7 +71,7 @@ export default function SettingsPage() {
                 ml_models: modelsOk,
             });
         } catch (error) {
-            console.error('Health check failed:', error);
+            console.error('Health check failed after retries:', error);
             setHealth({ api: false, database: false, ml_models: false });
         } finally {
             setChecking(false);
@@ -85,7 +106,7 @@ export default function SettingsPage() {
                                 <span className={`${styles.healthDot} ${health?.api ? styles.healthy : styles.unhealthy}`}></span>
                                 <span>API Server</span>
                                 <span className={styles.healthStatus}>
-                                    {checking ? 'Checking...' : health?.api ? 'Operational' : 'Down'}
+                                    {checking ? 'Waking up...' : health?.api ? 'Operational' : 'Down'}
                                 </span>
                             </div>
                             <div className={styles.healthItem}>

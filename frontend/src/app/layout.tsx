@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import '@/styles/globals.css';
 import { AuthProvider } from '@/lib/auth-context';
+import ClientProviders from './ClientProviders';
 
 export const metadata: Metadata = {
     title: 'VisaSight - AI-Enabled Visa Status Prediction',
@@ -27,7 +28,9 @@ export default function RootLayout({
             </head>
             <body>
                 <AuthProvider>
-                    {children}
+                    <ClientProviders>
+                        {children}
+                    </ClientProviders>
                 </AuthProvider>
             </body>
         </html>
