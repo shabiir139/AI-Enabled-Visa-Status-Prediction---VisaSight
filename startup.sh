@@ -27,11 +27,11 @@ echo -e "${GREEN}✓ Caches cleared${NC}"
 
 # Step 3: Check if backend is running
 echo -e "\n${CYAN}[3/4] Checking backend status...${NC}"
-if curl -s http://localhost:8000/health > /dev/null 2>&1; then
-    echo -e "${GREEN}✓ Backend is running on port 8000${NC}"
+if curl -s http://localhost:8080/health > /dev/null 2>&1; then
+    echo -e "${GREEN}✓ Backend is running on port 8080${NC}"
 else
     echo -e "${YELLOW}⚠ Backend not detected. Start it with:${NC}"
-    echo -e "   cd backend && python -m uvicorn main:app --reload --port 8000"
+    echo -e "   cd backend && python -m uvicorn main:app --reload --port 8080"
 fi
 
 # Step 4: Frontend status

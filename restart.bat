@@ -19,7 +19,7 @@ echo [3/3] Instructions for manual restart:
 echo.
 echo TERMINAL 1 (Backend):
 echo   cd backend
-echo   python -m uvicorn main:app --reload --port 8000
+echo   python -m uvicorn main:app --reload --port 8080
 echo.
 echo TERMINAL 2 (Frontend):
 echo   cd frontend
