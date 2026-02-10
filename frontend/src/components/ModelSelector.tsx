@@ -112,7 +112,7 @@ export default function ModelSelector() {
                         {model.metrics && Object.keys(model.metrics).some(k => model.metrics?.[k] != null) && (
                             <div className={styles.metrics}>
                                 {Object.entries(model.metrics)
-                                    .filter(([, val]) => val != null)
+                                    .filter(([, val]) => val != null && model.metrics)
                                     .map(([key, val]) => (
                                         <div key={key} className={styles.metric}>
                                             <span className={styles.metricLabel}>{key}</span>
