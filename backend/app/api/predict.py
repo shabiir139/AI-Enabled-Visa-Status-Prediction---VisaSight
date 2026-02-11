@@ -23,7 +23,7 @@ predictor = get_predictor()
 
 
 @router.post("/status", response_model=PredictionResult)
-async def predict_status(request: PredictRequest):
+def predict_status(request: PredictRequest):
     """
     Predict visa status probabilities.
     
@@ -36,7 +36,7 @@ async def predict_status(request: PredictRequest):
 
 
 @router.post("/processing-time", response_model=PredictionResult)
-async def predict_processing_time(request: PredictRequest):
+def predict_processing_time(request: PredictRequest):
     """
     Estimate visa processing time.
     
@@ -48,7 +48,7 @@ async def predict_processing_time(request: PredictRequest):
 
 
 @router.get("/explain/{case_id}")
-async def get_prediction_explanation(case_id: str):
+def get_prediction_explanation(case_id: str):
     """
     Get SHAP-based explanation for a prediction.
     
