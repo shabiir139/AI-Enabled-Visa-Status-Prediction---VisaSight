@@ -242,8 +242,6 @@ class VisaPredictor:
     def _mock_prediction(self, case_id: str, case_data: Dict) -> PredictionResult:
         """Generate mock prediction for development."""
         import random
-        import time
-        time.sleep(2) # Simulate CPU load
         
         # Simulated probabilities influenced by case data
         base_approved = 0.70
