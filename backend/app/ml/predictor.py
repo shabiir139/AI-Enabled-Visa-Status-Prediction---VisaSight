@@ -10,6 +10,7 @@ from datetime import datetime
 import uuid
 import os
 import sys
+import threading
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any, Union
 
@@ -57,6 +58,7 @@ class VisaPredictor:
         self.explainer = None
         
         self.loaded = False
+        self._lock = threading.Lock()
     
     def load_models(self) -> bool:
         """
@@ -65,43 +67,48 @@ class VisaPredictor:
         Returns:
             True if models loaded successfully
         """
-        if self.model_type == "mock":
-            self.loaded = True
-            print("📦 Using mock predictions")
-            return True
-        
-        if not HAS_ML_MODULES:
-            print("⚠️ ML modules not available, falling back to mock")
-            self.model_type = "mock"
-            self.loaded = True
-            return True
-        
-        try:
-            # Initialize encoders
-            from feature_engineering import CaseTextEncoder
-            self.text_encoder = CaseTextEncoder()
-            
-            if self.model_type.startswith("baseline"):
-                self._load_baseline_models()
-            elif self.model_type == "hf":
-                self._load_hf_models()
-                
-            self.loaded = True
-            print(f"✅ Models loaded: {self.model_type}")
-            return True
+        with self._lock:
+            # Double-check locking pattern
+            if self.loaded:
+                return True
 
-        except ImportError as e:
-            print(f"⚠️ ML dependency missing: {e}. Falling back to mock.")
-            self.model_type = "mock"
-            self.loaded = True
-            return True
+            if self.model_type == "mock":
+                self.loaded = True
+                print("📦 Using mock predictions")
+                return True
             
-        except Exception as e:
-            print(f"❌ Failed to load models: {e}")
-            print("⚠️ Falling back to mock predictions")
-            self.model_type = "mock"
-            self.loaded = True
-            return False
+            if not HAS_ML_MODULES:
+                print("⚠️ ML modules not available, falling back to mock")
+                self.model_type = "mock"
+                self.loaded = True
+                return True
+
+            try:
+                # Initialize encoders
+                from feature_engineering import CaseTextEncoder
+                self.text_encoder = CaseTextEncoder()
+                
+                if self.model_type.startswith("baseline"):
+                    self._load_baseline_models()
+                elif self.model_type == "hf":
+                    self._load_hf_models()
+
+                self.loaded = True
+                print(f"✅ Models loaded: {self.model_type}")
+                return True
+
+            except ImportError as e:
+                print(f"⚠️ ML dependency missing: {e}. Falling back to mock.")
+                self.model_type = "mock"
+                self.loaded = True
+                return True
+
+            except Exception as e:
+                print(f"❌ Failed to load models: {e}")
+                print("⚠️ Falling back to mock predictions")
+                self.model_type = "mock"
+                self.loaded = True
+                return False
     
     def _load_baseline_models(self):
         """Load baseline RF/XGBoost models."""
