@@ -10,6 +10,7 @@ from datetime import datetime
 import uuid
 import os
 import sys
+import threading
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any, Union
 
@@ -57,6 +58,7 @@ class VisaPredictor:
         self.explainer = None
         
         self.loaded = False
+        self._lock = threading.Lock()
     
     def load_models(self) -> bool:
         """
@@ -65,37 +67,47 @@ class VisaPredictor:
         Returns:
             True if models loaded successfully
         """
-        if self.model_type == "mock":
-            self.loaded = True
-            print("📦 Using mock predictions")
-            return True
-        
-        if not HAS_ML_MODULES:
-            print("⚠️ ML modules not available, falling back to mock")
-            self.model_type = "mock"
-            self.loaded = True
-            return True
-        
-        try:
-            # Initialize encoders
-            from feature_engineering import CaseTextEncoder
-            self.text_encoder = CaseTextEncoder()
-            
-            if self.model_type.startswith("baseline"):
-                self._load_baseline_models()
-            elif self.model_type == "hf":
-                self._load_hf_models()
-                
-            self.loaded = True
-            print(f"✅ Models loaded: {self.model_type}")
+        # First check (unlocked)
+        if self.loaded:
             return True
 
-        except ImportError as e:
-            print(f"⚠️ ML dependency missing: {e}. Falling back to mock.")
-            self.model_type = "mock"
-            self.loaded = True
-            return True
-            
+        try:
+            with self._lock:
+                # Second check (locked)
+                if self.loaded:
+                    return True
+
+                if self.model_type == "mock":
+                    self.loaded = True
+                    print("📦 Using mock predictions")
+                    return True
+                
+                if not HAS_ML_MODULES:
+                    print("⚠️ ML modules not available, falling back to mock")
+                    self.model_type = "mock"
+                    self.loaded = True
+                    return True
+
+                try:
+                    # Initialize encoders
+                    from feature_engineering import CaseTextEncoder
+                    self.text_encoder = CaseTextEncoder()
+
+                    if self.model_type.startswith("baseline"):
+                        self._load_baseline_models()
+                    elif self.model_type == "hf":
+                        self._load_hf_models()
+
+                    self.loaded = True
+                    print(f"✅ Models loaded: {self.model_type}")
+                    return True
+
+                except ImportError as e:
+                    print(f"⚠️ ML dependency missing: {e}. Falling back to mock.")
+                    self.model_type = "mock"
+                    self.loaded = True
+                    return True
+
         except Exception as e:
             print(f"❌ Failed to load models: {e}")
             print("⚠️ Falling back to mock predictions")
@@ -451,6 +463,7 @@ class VisaPredictor:
 
 # Global predictor cache
 _predictors: Dict[str, VisaPredictor] = {}
+_global_lock = threading.Lock()
 
 
 def get_predictor(model_type: Optional[str] = None) -> VisaPredictor:
@@ -461,15 +474,19 @@ def get_predictor(model_type: Optional[str] = None) -> VisaPredictor:
     if model_type is None:
         model_type = os.getenv("MODEL_TYPE", "mock")
     
+    # First check (unlocked)
     if model_type not in _predictors:
-        predictor = VisaPredictor(model_type=model_type)
-        # In production/Railway, we default to NOT loading models at startup
-        # unless specifically requested. This prevents OOM during healthchecks.
-        load_on_startup = os.getenv("LOAD_MODELS_ON_STARTUP", "false").lower() == "true"
-        
-        if load_on_startup:
-            predictor.load_models()
-            
-        _predictors[model_type] = predictor
+        with _global_lock:
+            # Second check (locked)
+            if model_type not in _predictors:
+                predictor = VisaPredictor(model_type=model_type)
+                # In production/Railway, we default to NOT loading models at startup
+                # unless specifically requested. This prevents OOM during healthchecks.
+                load_on_startup = os.getenv("LOAD_MODELS_ON_STARTUP", "false").lower() == "true"
+
+                if load_on_startup:
+                    predictor.load_models()
+
+                _predictors[model_type] = predictor
     
     return _predictors[model_type]
