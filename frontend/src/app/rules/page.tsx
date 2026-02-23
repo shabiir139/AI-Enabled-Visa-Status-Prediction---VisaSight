@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '@/components/Navbar';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { api } from '@/lib/api';
@@ -13,7 +13,7 @@ export default function RulesPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchRules = async () => {
+    const fetchRules = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
@@ -33,11 +33,11 @@ export default function RulesPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [selectedType]);
 
     React.useEffect(() => {
         fetchRules();
-    }, [selectedType]);
+    }, [fetchRules]);
 
     const getImpactLevel = (score: number) => {
         if (score >= 4) return 'high';
