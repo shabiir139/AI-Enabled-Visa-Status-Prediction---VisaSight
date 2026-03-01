@@ -111,7 +111,7 @@ async def create_visa_case(
 
 
 @router.get("", response_model=PaginatedResponse)
-async def list_visa_cases(
+def list_visa_cases(
     page: int = 1, 
     per_page: int = 10,
     authorization: Optional[str] = Header(None)
@@ -120,7 +120,8 @@ async def list_visa_cases(
     user_id = get_user_id_from_token(authorization)
     
     try:
-        query = supabase.table("visa_cases").select("*")
+        # ⚡ Bolt: Use count='exact' to combine data fetch and count into a single database query, avoiding N+1 overhead
+        query = supabase.table("visa_cases").select("*", count="exact")
         
         if user_id:
             query = query.eq("user_id", user_id)
@@ -132,12 +133,8 @@ async def list_visa_cases(
         
         result = query.execute()
         
-        # Get total count
-        count_result = supabase.table("visa_cases").select("id", count="exact")
-        if user_id:
-            count_result = count_result.eq("user_id", user_id)
-        count_data = count_result.execute()
-        total = count_data.count if hasattr(count_data, 'count') else len(result.data)
+        # Get total count directly from the result object
+        total = result.count if hasattr(result, 'count') and result.count is not None else len(result.data)
         
         cases = [
             VisaCaseResponse(
