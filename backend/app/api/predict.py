@@ -23,7 +23,10 @@ predictor = get_predictor()
 
 
 @router.post("/status", response_model=PredictionResult)
-async def predict_status(request: PredictRequest):
+def predict_status(request: PredictRequest):
+    # BOLT OPTIMIZATION: Changed async def to def. ML inference is CPU-bound
+    # and blocking. Using 'def' offloads execution to an external thread pool,
+    # preventing the main event loop from blocking other incoming requests.
     """
     Predict visa status probabilities.
     
@@ -36,7 +39,9 @@ async def predict_status(request: PredictRequest):
 
 
 @router.post("/processing-time", response_model=PredictionResult)
-async def predict_processing_time(request: PredictRequest):
+def predict_processing_time(request: PredictRequest):
+    # BOLT OPTIMIZATION: Changed async def to def. ML inference is CPU-bound
+    # and blocking. Using 'def' offloads execution to an external thread pool.
     """
     Estimate visa processing time.
     
@@ -48,7 +53,9 @@ async def predict_processing_time(request: PredictRequest):
 
 
 @router.get("/explain/{case_id}")
-async def get_prediction_explanation(case_id: str):
+def get_prediction_explanation(case_id: str):
+    # BOLT OPTIMIZATION: Changed async def to def. ML inference/explanation is CPU-bound
+    # and blocking. Using 'def' offloads execution to an external thread pool.
     """
     Get SHAP-based explanation for a prediction.
     
