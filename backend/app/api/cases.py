@@ -35,10 +35,14 @@ def get_user_id_from_token(authorization: Optional[str] = None) -> Optional[str]
 
 
 @router.post("", response_model=VisaCaseResponse)
-async def create_visa_case(
+def create_visa_case(
     case_data: VisaCaseCreate,
     authorization: Optional[str] = Header(None)
 ):
+    # BOLT OPTIMIZATION:
+    # Changed async def to def. Supabase synchronous client calls block the event loop.
+    # Using 'def' offloads execution to an external thread pool, improving throughput.
+    # Impact: Eliminates event loop blocking, enabling high concurrency handling.
     """Create a new visa case."""
     user_id = get_user_id_from_token(authorization)
     
@@ -111,7 +115,7 @@ async def create_visa_case(
 
 
 @router.get("", response_model=PaginatedResponse)
-async def list_visa_cases(
+def list_visa_cases(
     page: int = 1, 
     per_page: int = 10,
     authorization: Optional[str] = Header(None)
@@ -119,8 +123,13 @@ async def list_visa_cases(
     """List all visa cases for the current user."""
     user_id = get_user_id_from_token(authorization)
     
+    # BOLT OPTIMIZATION:
+    # 1. Changed async def to def for synchronous Supabase client to avoid blocking event loop.
+    # 2. Combined .select('*') and count='exact' to eliminate a full database round-trip.
+    # Impact: Reduces DB queries by 50% for this endpoint, improving response time significantly.
+
     try:
-        query = supabase.table("visa_cases").select("*")
+        query = supabase.table("visa_cases").select("*", count="exact")
         
         if user_id:
             query = query.eq("user_id", user_id)
@@ -132,12 +141,8 @@ async def list_visa_cases(
         
         result = query.execute()
         
-        # Get total count
-        count_result = supabase.table("visa_cases").select("id", count="exact")
-        if user_id:
-            count_result = count_result.eq("user_id", user_id)
-        count_data = count_result.execute()
-        total = count_data.count if hasattr(count_data, 'count') else len(result.data)
+        # Get total count from the same result
+        total = result.count if hasattr(result, 'count') and result.count is not None else len(result.data)
         
         cases = [
             VisaCaseResponse(
@@ -177,10 +182,12 @@ async def list_visa_cases(
 
 
 @router.get("/{case_id}", response_model=VisaCaseResponse)
-async def get_visa_case(
+def get_visa_case(
     case_id: str,
     authorization: Optional[str] = Header(None)
 ):
+    # BOLT OPTIMIZATION: Changed async def to def. Supabase synchronous client
+    # blocks the event loop. Using 'def' offloads execution to a thread pool.
     """Get a specific visa case by ID."""
     try:
         result = supabase.table("visa_cases").select("*").eq("id", case_id).single().execute()
@@ -211,11 +218,13 @@ async def get_visa_case(
 
 
 @router.patch("/{case_id}", response_model=VisaCaseResponse)
-async def update_visa_case(
+def update_visa_case(
     case_id: str, 
     updates: dict,
     authorization: Optional[str] = Header(None)
 ):
+    # BOLT OPTIMIZATION: Changed async def to def. Supabase synchronous client
+    # blocks the event loop. Using 'def' offloads execution to a thread pool.
     """Update a visa case."""
     try:
         # Filter allowed update fields
@@ -254,10 +263,12 @@ async def update_visa_case(
 
 
 @router.delete("/{case_id}")
-async def delete_visa_case(
+def delete_visa_case(
     case_id: str,
     authorization: Optional[str] = Header(None)
 ):
+    # BOLT OPTIMIZATION: Changed async def to def. Supabase synchronous client
+    # blocks the event loop. Using 'def' offloads execution to a thread pool.
     """Delete a visa case."""
     try:
         result = supabase.table("visa_cases").delete().eq("id", case_id).execute()

@@ -21,15 +21,19 @@ router = APIRouter()
 
 
 @router.get("", response_model=PaginatedResponse)
-async def list_visa_rules(
+def list_visa_rules(
     visa_type: Optional[str] = None,
     category: Optional[str] = None,
     page: int = 1,
     per_page: int = 10,
 ):
     """List visa rules with optional filtering."""
+    # BOLT OPTIMIZATION:
+    # 1. Changed async def to def for synchronous Supabase client to avoid blocking event loop.
+    # 2. Combined .select('*') and count='exact' to eliminate a full database round-trip.
+    # Impact: Reduces DB queries by 50% for this endpoint, improving response time.
     try:
-        query = supabase.table("visa_rules").select("*").eq("is_active", True)
+        query = supabase.table("visa_rules").select("*", count="exact").eq("is_active", True)
         
         if visa_type:
             query = query.eq("visa_type", visa_type)
@@ -58,14 +62,8 @@ async def list_visa_rules(
             for row in result.data
         ]
         
-        # Get total count
-        count_query = supabase.table("visa_rules").select("id", count="exact").eq("is_active", True)
-        if visa_type:
-            count_query = count_query.eq("visa_type", visa_type)
-        if category:
-            count_query = count_query.eq("rule_category", category)
-        count_result = count_query.execute()
-        total = count_result.count if hasattr(count_result, 'count') and count_result.count else len(result.data)
+        # Get total count from the same result
+        total = result.count if hasattr(result, 'count') and result.count is not None else len(result.data)
         
         return PaginatedResponse(
             items=rules,
@@ -87,7 +85,9 @@ async def list_visa_rules(
 
 
 @router.get("/updates", response_model=List[UpdateEventResponse])
-async def get_rule_updates(days_back: int = 7):
+def get_rule_updates(days_back: int = 7):
+    # BOLT OPTIMIZATION: Changed async def to def. Supabase synchronous client
+    # blocks the event loop. Using 'def' offloads execution to a thread pool.
     """Get recent rule updates."""
     try:
         result = supabase.table("update_events")\
@@ -114,7 +114,9 @@ async def get_rule_updates(days_back: int = 7):
 
 
 @router.get("/{rule_id}", response_model=VisaRuleResponse)
-async def get_visa_rule(rule_id: str):
+def get_visa_rule(rule_id: str):
+    # BOLT OPTIMIZATION: Changed async def to def. Supabase synchronous client
+    # blocks the event loop. Using 'def' offloads execution to a thread pool.
     """Get a specific rule by ID."""
     try:
         result = supabase.table("visa_rules").select("*").eq("id", rule_id).single().execute()
