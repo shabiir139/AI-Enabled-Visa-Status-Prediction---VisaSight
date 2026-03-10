@@ -1,0 +1,3 @@
+## 2024-03-10 - [Supabase Pagination Consolidation]
+**Learning:** [When fetching paginated data using the Supabase Python client, we don't need to perform two separate queries (one for data, one for count). By adding `count="exact"` to the `.select("*")` method, Supabase returns both the paginated data and the total exact count in a single database request. The total count is accessible via the `.count` attribute on the returned result object, provided it is not None.]
+**Action:** [Always use `.select("*", count="exact")` and check `result.count` for pagination queries to reduce database latency by halving the number of network requests.]
