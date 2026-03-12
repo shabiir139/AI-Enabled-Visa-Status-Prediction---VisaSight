@@ -1,0 +1,4 @@
+
+## 2024-03-12 - FastAPI Synchronous Clients in Async Routes
+**Learning:** Using a synchronous client (like the Supabase Python client) inside an `async def` FastAPI route completely blocks the single main event loop thread while waiting for network I/O. This leads to horrific performance under load, as the server handles requests completely sequentially. By changing the route definitions to `def` instead of `async def`, FastAPI recognizes them as synchronous and automatically runs them in an external threadpool. This ensures that blocking I/O only blocks a threadpool thread, leaving the main event loop perfectly free to accept and handle other incoming requests concurrently.
+**Action:** When using a synchronous database client or running synchronous, CPU-bound machine learning tasks in FastAPI, always define the route handlers as `def` instead of `async def` to utilize threadpooling and prevent blocking the main event loop.
