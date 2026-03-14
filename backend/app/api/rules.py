@@ -21,7 +21,7 @@ router = APIRouter()
 
 
 @router.get("", response_model=PaginatedResponse)
-async def list_visa_rules(
+def list_visa_rules(
     visa_type: Optional[str] = None,
     category: Optional[str] = None,
     page: int = 1,
@@ -29,7 +29,8 @@ async def list_visa_rules(
 ):
     """List visa rules with optional filtering."""
     try:
-        query = supabase.table("visa_rules").select("*").eq("is_active", True)
+        # Optimization: Use count='exact' to combine data fetch and count in a single roundtrip
+        query = supabase.table("visa_rules").select("*", count="exact").eq("is_active", True)
         
         if visa_type:
             query = query.eq("visa_type", visa_type)
@@ -43,6 +44,9 @@ async def list_visa_rules(
         
         result = query.execute()
         
+        # Get total count directly from the paginated result
+        total = result.count if hasattr(result, 'count') and result.count is not None else len(result.data)
+
         rules = [
             VisaRuleResponse(
                 id=row["id"],
@@ -57,15 +61,6 @@ async def list_visa_rules(
             )
             for row in result.data
         ]
-        
-        # Get total count
-        count_query = supabase.table("visa_rules").select("id", count="exact").eq("is_active", True)
-        if visa_type:
-            count_query = count_query.eq("visa_type", visa_type)
-        if category:
-            count_query = count_query.eq("rule_category", category)
-        count_result = count_query.execute()
-        total = count_result.count if hasattr(count_result, 'count') and count_result.count else len(result.data)
         
         return PaginatedResponse(
             items=rules,
@@ -87,7 +82,7 @@ async def list_visa_rules(
 
 
 @router.get("/updates", response_model=List[UpdateEventResponse])
-async def get_rule_updates(days_back: int = 7):
+def get_rule_updates(days_back: int = 7):
     """Get recent rule updates."""
     try:
         result = supabase.table("update_events")\
@@ -114,7 +109,7 @@ async def get_rule_updates(days_back: int = 7):
 
 
 @router.get("/{rule_id}", response_model=VisaRuleResponse)
-async def get_visa_rule(rule_id: str):
+def get_visa_rule(rule_id: str):
     """Get a specific rule by ID."""
     try:
         result = supabase.table("visa_rules").select("*").eq("id", rule_id).single().execute()
