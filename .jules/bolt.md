@@ -1,0 +1,3 @@
+## 2024-05-18 - [Optimize Supabase Pagination Queries]
+**Learning:** [The Supabase Python client's `.select()` method allows fetching exact counts alongside data queries via the `count='exact'` parameter, eliminating the need to execute redundant database count requests in list endpoints.]
+**Action:** [Next time working with Supabase pagination endpoints in the backend, always leverage `.select("*", count="exact")` instead of making dual queries for data and total count separately, effectively cutting down database hits by 50% for list views.]
