@@ -34,8 +34,10 @@ def get_user_id_from_token(authorization: Optional[str] = None) -> Optional[str]
         return None
 
 
+# Optimization: Using `def` instead of `async def` because the supabase-py client
+# executes synchronous blocking I/O. FastAPI will run this in a threadpool to prevent blocking the event loop.
 @router.post("", response_model=VisaCaseResponse)
-async def create_visa_case(
+def create_visa_case(
     case_data: VisaCaseCreate,
     authorization: Optional[str] = Header(None)
 ):
@@ -110,8 +112,10 @@ async def create_visa_case(
         )
 
 
+# Optimization: Using `def` instead of `async def` because the supabase-py client
+# executes synchronous blocking I/O. FastAPI will run this in a threadpool to prevent blocking the event loop.
 @router.get("", response_model=PaginatedResponse)
-async def list_visa_cases(
+def list_visa_cases(
     page: int = 1, 
     per_page: int = 10,
     authorization: Optional[str] = Header(None)
@@ -176,8 +180,10 @@ async def list_visa_cases(
         )
 
 
+# Optimization: Using `def` instead of `async def` because the supabase-py client
+# executes synchronous blocking I/O. FastAPI will run this in a threadpool to prevent blocking the event loop.
 @router.get("/{case_id}", response_model=VisaCaseResponse)
-async def get_visa_case(
+def get_visa_case(
     case_id: str,
     authorization: Optional[str] = Header(None)
 ):
@@ -210,8 +216,10 @@ async def get_visa_case(
         raise HTTPException(status_code=404, detail="Case not found")
 
 
+# Optimization: Using `def` instead of `async def` because the supabase-py client
+# executes synchronous blocking I/O. FastAPI will run this in a threadpool to prevent blocking the event loop.
 @router.patch("/{case_id}", response_model=VisaCaseResponse)
-async def update_visa_case(
+def update_visa_case(
     case_id: str, 
     updates: dict,
     authorization: Optional[str] = Header(None)
@@ -253,8 +261,10 @@ async def update_visa_case(
         raise HTTPException(status_code=500, detail="Failed to update case")
 
 
+# Optimization: Using `def` instead of `async def` because the supabase-py client
+# executes synchronous blocking I/O. FastAPI will run this in a threadpool to prevent blocking the event loop.
 @router.delete("/{case_id}")
-async def delete_visa_case(
+def delete_visa_case(
     case_id: str,
     authorization: Optional[str] = Header(None)
 ):
