@@ -41,7 +41,7 @@ _active_model_type = "mock"
 
 
 @router.get("", response_model=List[ModelInfo])
-async def list_models():
+def list_models():
     """List all available model versions."""
     models = [
         ModelInfo(
@@ -158,7 +158,7 @@ async def list_models():
 
 
 @router.get("/active")
-async def get_active_model():
+def get_active_model():
     """Get the currently active model."""
     return {
         "model_type": _active_model_type,
@@ -167,7 +167,7 @@ async def get_active_model():
 
 
 @router.post("/switch")
-async def switch_model(request: ModelSwitchRequest):
+def switch_model(request: ModelSwitchRequest):
     """
     Switch to a different model type.
     
@@ -211,7 +211,7 @@ async def switch_model(request: ModelSwitchRequest):
 
 
 @router.get("/metrics/{model_type}")
-async def get_model_metrics(model_type: str):
+def get_model_metrics(model_type: str):
     """Get detailed metrics for a model type."""
     report_paths = {
         "baseline": MODELS_DIR / "training_report_rf.json",

@@ -16,7 +16,7 @@ router = APIRouter()
 
 
 @router.get("/stats", response_model=DashboardStats)
-async def get_dashboard_stats():
+def get_dashboard_stats():
     """Get dashboard statistics."""
     return DashboardStats(
         total_cases=1247,
@@ -28,7 +28,7 @@ async def get_dashboard_stats():
 
 
 @router.get("/processing-time", response_model=List[ProcessingTimeDataPoint])
-async def get_processing_time_chart(
+def get_processing_time_chart(
     visa_type: Optional[str] = None,
     months: int = 6,
 ):
@@ -44,7 +44,7 @@ async def get_processing_time_chart(
 
 
 @router.get("/approval-rates", response_model=List[ApprovalRateDataPoint])
-async def get_approval_rate_chart(
+def get_approval_rate_chart(
     visa_type: Optional[str] = None,
     months: int = 6,
 ):
@@ -60,7 +60,7 @@ async def get_approval_rate_chart(
 
 
 @router.get("/rule-volatility", response_model=List[RuleVolatilityDataPoint])
-async def get_rule_volatility_chart(weeks: int = 12):
+def get_rule_volatility_chart(weeks: int = 12):
     """Get rule volatility index data."""
     return [
         RuleVolatilityDataPoint(week="W44", updates=5, impact_score=2.3),

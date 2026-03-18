@@ -21,7 +21,7 @@ router = APIRouter()
 
 
 @router.get("", response_model=PaginatedResponse)
-async def list_visa_rules(
+def list_visa_rules(
     visa_type: Optional[str] = None,
     category: Optional[str] = None,
     page: int = 1,
@@ -87,7 +87,7 @@ async def list_visa_rules(
 
 
 @router.get("/updates", response_model=List[UpdateEventResponse])
-async def get_rule_updates(days_back: int = 7):
+def get_rule_updates(days_back: int = 7):
     """Get recent rule updates."""
     try:
         result = supabase.table("update_events")\
@@ -114,7 +114,7 @@ async def get_rule_updates(days_back: int = 7):
 
 
 @router.get("/{rule_id}", response_model=VisaRuleResponse)
-async def get_visa_rule(rule_id: str):
+def get_visa_rule(rule_id: str):
     """Get a specific rule by ID."""
     try:
         result = supabase.table("visa_rules").select("*").eq("id", rule_id).single().execute()
