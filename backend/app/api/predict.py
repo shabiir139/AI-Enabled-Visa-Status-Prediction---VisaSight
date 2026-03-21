@@ -23,9 +23,10 @@ predictor = get_predictor()
 
 
 @router.post("/status", response_model=PredictionResult)
-async def predict_status(request: PredictRequest):
+def predict_status(request: PredictRequest):
     """
     Predict visa status probabilities.
+    # ⚡ Bolt Optimization: Use `def` instead of `async def` for CPU-bound ML inferences to prevent blocking the event loop
     
     Uses XGBoost/LightGBM models to predict the probability
     of Approved, RFE, or Denied outcomes.
@@ -36,9 +37,10 @@ async def predict_status(request: PredictRequest):
 
 
 @router.post("/processing-time", response_model=PredictionResult)
-async def predict_processing_time(request: PredictRequest):
+def predict_processing_time(request: PredictRequest):
     """
     Estimate visa processing time.
+    # ⚡ Bolt Optimization: Use `def` instead of `async def` for CPU-bound ML inferences to prevent blocking the event loop
     
     Uses survival analysis models to estimate remaining
     days until decision with confidence intervals.
@@ -48,9 +50,10 @@ async def predict_processing_time(request: PredictRequest):
 
 
 @router.get("/explain/{case_id}")
-async def get_prediction_explanation(case_id: str):
+def get_prediction_explanation(case_id: str):
     """
     Get SHAP-based explanation for a prediction.
+    # ⚡ Bolt Optimization: Use `def` instead of `async def` for CPU-bound SHAP explanation generation to prevent blocking the event loop
     
     Returns feature importance and top factors
     influencing the prediction.

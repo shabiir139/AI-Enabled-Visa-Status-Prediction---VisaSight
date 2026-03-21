@@ -35,11 +35,12 @@ def get_user_id_from_token(authorization: Optional[str] = None) -> Optional[str]
 
 
 @router.post("", response_model=VisaCaseResponse)
-async def create_visa_case(
+def create_visa_case(
     case_data: VisaCaseCreate,
     authorization: Optional[str] = Header(None)
 ):
     """Create a new visa case."""
+    # ⚡ Bolt Optimization: Use `def` instead of `async def` for synchronous DB calls to prevent blocking the event loop
     user_id = get_user_id_from_token(authorization)
     
     if not user_id:
@@ -111,16 +112,18 @@ async def create_visa_case(
 
 
 @router.get("", response_model=PaginatedResponse)
-async def list_visa_cases(
+def list_visa_cases(
     page: int = 1, 
     per_page: int = 10,
     authorization: Optional[str] = Header(None)
 ):
     """List all visa cases for the current user."""
+    # ⚡ Bolt Optimization: Use `def` instead of `async def` for synchronous DB calls to prevent blocking the event loop
     user_id = get_user_id_from_token(authorization)
     
     try:
-        query = supabase.table("visa_cases").select("*")
+        # ⚡ Bolt Optimization: Use select("*", count="exact") to fetch data and count in a single database roundtrip
+        query = supabase.table("visa_cases").select("*", count="exact")
         
         if user_id:
             query = query.eq("user_id", user_id)
@@ -132,12 +135,7 @@ async def list_visa_cases(
         
         result = query.execute()
         
-        # Get total count
-        count_result = supabase.table("visa_cases").select("id", count="exact")
-        if user_id:
-            count_result = count_result.eq("user_id", user_id)
-        count_data = count_result.execute()
-        total = count_data.count if hasattr(count_data, 'count') else len(result.data)
+        total = result.count if hasattr(result, 'count') and result.count is not None else len(result.data)
         
         cases = [
             VisaCaseResponse(
@@ -177,11 +175,12 @@ async def list_visa_cases(
 
 
 @router.get("/{case_id}", response_model=VisaCaseResponse)
-async def get_visa_case(
+def get_visa_case(
     case_id: str,
     authorization: Optional[str] = Header(None)
 ):
     """Get a specific visa case by ID."""
+    # ⚡ Bolt Optimization: Use `def` instead of `async def` for synchronous DB calls to prevent blocking the event loop
     try:
         result = supabase.table("visa_cases").select("*").eq("id", case_id).single().execute()
         
@@ -211,12 +210,13 @@ async def get_visa_case(
 
 
 @router.patch("/{case_id}", response_model=VisaCaseResponse)
-async def update_visa_case(
+def update_visa_case(
     case_id: str, 
     updates: dict,
     authorization: Optional[str] = Header(None)
 ):
     """Update a visa case."""
+    # ⚡ Bolt Optimization: Use `def` instead of `async def` for synchronous DB calls to prevent blocking the event loop
     try:
         # Filter allowed update fields
         allowed_fields = {
@@ -254,11 +254,12 @@ async def update_visa_case(
 
 
 @router.delete("/{case_id}")
-async def delete_visa_case(
+def delete_visa_case(
     case_id: str,
     authorization: Optional[str] = Header(None)
 ):
     """Delete a visa case."""
+    # ⚡ Bolt Optimization: Use `def` instead of `async def` for synchronous DB calls to prevent blocking the event loop
     try:
         result = supabase.table("visa_cases").delete().eq("id", case_id).execute()
         
