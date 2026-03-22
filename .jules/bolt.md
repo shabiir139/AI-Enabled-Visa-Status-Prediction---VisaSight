@@ -1,0 +1,3 @@
+## 2024-06-18 - Supabase Python Client Pagination Optimization
+**Learning:** The Supabase Python client can fetch both the query data and the total record count in a single network request using `.select('*', count='exact')`. The count is returned as a direct attribute on the response object (`result.count`). Previously, developers were making two separate requests (one for `select('*')` and another for `select('id', count='exact')`), causing an N+1 like performance bottleneck.
+**Action:** Always use `.select('*', count='exact')` for paginated queries in the backend and access `result.count` to avoid redundant database queries.
