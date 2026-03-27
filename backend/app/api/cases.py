@@ -35,11 +35,15 @@ def get_user_id_from_token(authorization: Optional[str] = None) -> Optional[str]
 
 
 @router.post("", response_model=VisaCaseResponse)
-async def create_visa_case(
+def create_visa_case(
     case_data: VisaCaseCreate,
     authorization: Optional[str] = Header(None)
 ):
     """Create a new visa case."""
+    # ⚡ Bolt Optimization:
+    # Changed from `async def` to `def` because the Supabase Python client
+    # executes synchronous blocking I/O calls. Using `def` offloads this execution
+    # to FastAPI's thread pool, preventing it from blocking the main async event loop.
     user_id = get_user_id_from_token(authorization)
     
     if not user_id:
@@ -111,12 +115,13 @@ async def create_visa_case(
 
 
 @router.get("", response_model=PaginatedResponse)
-async def list_visa_cases(
+def list_visa_cases(
     page: int = 1, 
     per_page: int = 10,
     authorization: Optional[str] = Header(None)
 ):
     """List all visa cases for the current user."""
+    # ⚡ Bolt Optimization: Offloaded synchronous DB operations to thread pool
     user_id = get_user_id_from_token(authorization)
     
     try:
@@ -177,11 +182,12 @@ async def list_visa_cases(
 
 
 @router.get("/{case_id}", response_model=VisaCaseResponse)
-async def get_visa_case(
+def get_visa_case(
     case_id: str,
     authorization: Optional[str] = Header(None)
 ):
     """Get a specific visa case by ID."""
+    # ⚡ Bolt Optimization: Offloaded synchronous DB operations to thread pool
     try:
         result = supabase.table("visa_cases").select("*").eq("id", case_id).single().execute()
         
@@ -211,12 +217,13 @@ async def get_visa_case(
 
 
 @router.patch("/{case_id}", response_model=VisaCaseResponse)
-async def update_visa_case(
+def update_visa_case(
     case_id: str, 
     updates: dict,
     authorization: Optional[str] = Header(None)
 ):
     """Update a visa case."""
+    # ⚡ Bolt Optimization: Offloaded synchronous DB operations to thread pool
     try:
         # Filter allowed update fields
         allowed_fields = {
@@ -254,11 +261,12 @@ async def update_visa_case(
 
 
 @router.delete("/{case_id}")
-async def delete_visa_case(
+def delete_visa_case(
     case_id: str,
     authorization: Optional[str] = Header(None)
 ):
     """Delete a visa case."""
+    # ⚡ Bolt Optimization: Offloaded synchronous DB operations to thread pool
     try:
         result = supabase.table("visa_cases").delete().eq("id", case_id).execute()
         
