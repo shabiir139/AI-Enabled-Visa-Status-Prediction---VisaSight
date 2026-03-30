@@ -1,0 +1,3 @@
+## 2025-02-27 - Supabase exact count network round-trip savings
+**Learning:** For list endpoints requiring pagination, performing a single `.select('*', count='exact')` correctly returns both the data and the total count. Performing a separate `.select('id', count='exact')` query just to get the total row count doubles the network round-trips and adds unnecessary latency. The count is accessible on the python object via `result.count`.
+**Action:** When working with Supabase Python client pagination queries, always use a single `select` method specifying `count='exact'` instead of splitting data fetch and count queries into two network requests.
