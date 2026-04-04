@@ -1,0 +1,3 @@
+## 2025-04-04 - Supabase Pagination Optimization
+**Learning:** In Supabase, executing a separate query to get the total count for pagination is an anti-pattern. You can retrieve both the data and the total count in a single query by using `select("*", count="exact")`, which saves a network roundtrip and reduces database load. The exact count is then available directly on the result object (`result.count`).
+**Action:** When writing paginated endpoints that use Supabase, always use the `count="exact"` parameter in the primary `select` call and retrieve the count from the response object, instead of running a separate `select("id", count="exact")` query.
