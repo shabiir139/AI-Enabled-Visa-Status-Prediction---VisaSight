@@ -1,0 +1,3 @@
+## 2024-05-18 - [Combine Pagination Queries with count='exact']
+**Learning:** Supabase allows retrieving both data and the total count in a single query by using `count="exact"` in the `.select()` method (e.g., `supabase.table("table").select("*", count="exact")`). This completely removes the need to construct and run a secondary, identical query purely to fetch the count, halving the database latency for paginated endpoints. When using this, the `.execute()` response object contains the count as a direct attribute.
+**Action:** Always use `.select("*", count="exact")` instead of dual queries for Supabase paginated endpoints, and extract the total directly from the response object via a fallback pattern to handle nullability.
