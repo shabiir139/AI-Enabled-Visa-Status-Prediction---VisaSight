@@ -1,0 +1,3 @@
+## 2024-05-18 - Supabase Pagination Anti-Pattern
+**Learning:** Supabase Python client's `.select(..., count='exact')` enables fetching both rows and the exact count in a single round trip. This app previously executed separate queries for fetching rows and fetching the count (N+1-like issue for pagination), doubling database latency for listing operations. The count is accessible directly on the result object (`result.count`).
+**Action:** Always combine row-fetching and counting in Supabase paginated queries using `count='exact'`, and extract the count with `result.count if hasattr(result, 'count') and result.count is not None else len(result.data)`.
