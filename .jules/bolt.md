@@ -1,0 +1,3 @@
+## 2025-02-18 - Supabase Single-Request Pagination
+**Learning:** Using separate `select("*")` and `select("id", count="exact")` queries is an anti-pattern when paginating in Supabase. Supabase natively supports fetching exact row counts alongside data payloads in a single request via `.select("*", count="exact")`.
+**Action:** When building paginated endpoints, always leverage `count="exact"` in the primary `select` method to halve the number of DB roundtrips. Parse the count dynamically and handle null cases gracefully using `result.count if hasattr(result, 'count') and result.count is not None else len(result.data)`.
