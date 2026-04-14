@@ -1,0 +1,3 @@
+## 2024-04-14 - Optimize Supabase Pagination Queries
+**Learning:** Supabase Python client's `.select('*', count='exact')` efficiently retrieves both the queried rows and the total count of the resource in a single network call. The previous pattern of executing a primary `.select('*')` query followed by an independent `.select('id', count='exact')` query created an N+1-like inefficiency due to multiple network requests. The `count` property is directly attached to the response object, separate from the `data` collection.
+**Action:** Always combine pagination bounds and total counts into a single `.select(..., count='exact')` statement and utilize `result.count` to retrieve the aggregated total, mitigating unnecessary network chatter.
