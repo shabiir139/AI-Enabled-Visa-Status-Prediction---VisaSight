@@ -1,0 +1,3 @@
+## 2024-05-24 - Single Query Pagination with Supabase
+**Learning:** For pagination in Supabase using the Python client, issuing a separate query to get the total count (e.g. `select("id", count="exact")`) is unnecessary and creates an N+1-like performance bottleneck. You can fetch both the data and the exact total count in a single query by using `.select("*", count="exact")`. The exact count will be accessible via the `.count` property of the response object, avoiding an entire network roundtrip.
+**Action:** Always combine the data fetch and total count retrieval into a single query using `.select("*", count="exact")` when building paginated endpoints using the Supabase Python client. Check for the count via `result.count` and fallback to `len(result.data)`.
