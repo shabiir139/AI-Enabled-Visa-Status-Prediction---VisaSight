@@ -1,0 +1,3 @@
+## 2025-05-18 - Supabase Pagination Optimization
+**Learning:** Supabase (via PostgREST) natively supports calculating the total count of an unpaginated result set while simultaneously returning the paginated subset in a single query execution by passing `count="exact"` into `.select()`.
+**Action:** Always utilize `.select("*", count="exact")` for endpoints requiring both pagination metadata and ranged result subsets to eliminate N+1 DB roundtrip anti-patterns. Use robust fallback syntax like `result.count if hasattr(result, 'count') and result.count is not None else len(result.data)` since `count` is a discrete attribute on the returned `APIResponse` object.
