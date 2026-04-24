@@ -1,0 +1,3 @@
+## 2024-04-24 - Supabase exact count query parsing
+**Learning:** When using `count="exact"` with `supabase.table().select("*", count="exact")` in Python, the returned total count is accessible via `result.count` and NOT nested inside the `result.data`. However, to prevent crashes if the `count` attribute is missing or `None` on the response object, you should extract it safely using `result.count if hasattr(result, 'count') and result.count is not None else len(result.data)`.
+**Action:** Always safely parse the `.count` property when optimizing Supabase pagination queries with `count="exact"` to combine total count retrieval and data fetching into a single network roundtrip.
