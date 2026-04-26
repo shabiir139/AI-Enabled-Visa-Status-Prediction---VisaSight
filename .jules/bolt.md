@@ -1,0 +1,3 @@
+## 2024-05-24 - Supabase Pagination Double-Query Optimization
+**Learning:** Supabase pagination patterns that issue separate `count` and `select` queries (e.g., `select('id', count='exact')` followed by `select('*')`) cause an unnecessary database roundtrip bottleneck, particularly visible in list endpoints like `list_visa_cases` and `list_visa_rules`.
+**Action:** When writing or optimizing paginated list endpoints, use the combined `.select("*", count="exact")` query and extract the count directly from `result.count`, saving one DB roundtrip per request while retaining exact counts.
