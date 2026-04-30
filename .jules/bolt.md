@@ -1,0 +1,3 @@
+## 2024-04-30 - Single Query Supabase Pagination Optimization
+**Learning:** In Supabase, pagination commonly suffers from an N+1 like latency issue when making one query for paginated data and a separate query for the total count.
+**Action:** By passing `count="exact"` into the `.select("*", count="exact")` query, you can fetch the data and the exact count in a single roundtrip. The exact count is then available on the python response object as `result.count` (fallback to `len(result.data)` if missing). Apply this combined pattern to any endpoint needing total counts and paginated data simultaneously.
