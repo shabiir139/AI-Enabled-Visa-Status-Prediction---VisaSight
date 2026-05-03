@@ -1,0 +1,3 @@
+## 2024-05-03 - Supabase Pagination Optimization
+**Learning:** For endpoints needing both paginated data and total counts, running two separate queries (e.g., `select("*")` and `select("id", count="exact")`) doubles the database latency. Supabase's Python client allows retrieving both the data and the exact count in a single query using `.select("*", count="exact")`, which returns a response object with a `count` attribute alongside the data.
+**Action:** When implementing pagination with Supabase, always use `.select("*", count="exact")` instead of separate queries to optimize performance and reduce database load. Extract the count defensively using `total = result.count if hasattr(result, 'count') and result.count is not None else len(result.data)`.
