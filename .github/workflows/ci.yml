@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./visasight/frontend
+        working-directory: ./frontend
 
     steps:
     - uses: actions/checkout@v4
@@ -22,16 +22,19 @@ jobs:
       with:
         node-version: '20.x'
         cache: 'npm'
-        cache-dependency-path: ./visasight/frontend/package-lock.json
+        cache-dependency-path: ./frontend/package-lock.json
 
     - name: Install Dependencies
-      run: npm install --legacy-peer-deps
+      run: npm install
+
+    - name: Install pnpm globally
+      run: npm install -g pnpm
 
     - name: Lint
-      run: npm run lint
+      run: pnpm lint
 
     - name: Build Check
-      run: npm run build
+      run: pnpm build
       env:
         # Mock values for build time just to check compilation
         NEXT_PUBLIC_SUPABASE_URL: "https://mock.supabase.co"
@@ -43,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./visasight/backend
+        working-directory: ./backend
 
     steps:
     - uses: actions/checkout@v4
