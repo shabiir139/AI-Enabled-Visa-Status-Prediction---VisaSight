@@ -1,0 +1,3 @@
+## 2025-02-28 - Supabase Exact Count Pagination Optimization
+**Learning:** By utilizing PostgREST/Supabase's built-in `count="exact"` functionality within a `.select()` query, the backend can retrieve both paginated dataset chunks and the total record count in a single network round-trip. This directly eliminates the pervasive N+1 or duplicate querying pattern where a subsequent count-only query was performed. The `count` parameter is accessible safely via `result.count` on the execution response object.
+**Action:** Always scan pagination endpoints in Supabase-integrated FastAPIs to ensure they retrieve totals directly via the select query arguments rather than executing separate count queries, thus halving the database latency impact for list views.
