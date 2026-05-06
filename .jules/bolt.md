@@ -1,0 +1,3 @@
+## 2025-02-28 - Supabase Pagination Optimization
+**Learning:** By default, paginated Supabase endpoints were firing two distinct queries per API request: one for the page data via `.select("*")` and a second for the count via `.select("id", count="exact")`. The `postgrest-py` client supports fetching both in a single round-trip by appending `count="exact"` directly to the initial `select` query.
+**Action:** When implementing pagination with the Supabase Python client, always append `count="exact"` to the primary query. The parsed count can be extracted safely via `result.count if hasattr(result, 'count') and result.count is not None else len(result.data)`.
