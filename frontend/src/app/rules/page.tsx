@@ -37,7 +37,8 @@ export default function RulesPage() {
 
     React.useEffect(() => {
         fetchRules();
-    }, [selectedType]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [page, visaType, category]);
 
     const getImpactLevel = (score: number) => {
         if (score >= 4) return 'high';
