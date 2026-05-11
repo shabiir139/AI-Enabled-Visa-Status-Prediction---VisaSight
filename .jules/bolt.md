@@ -1,0 +1,3 @@
+## 2024-05-11 - Combine Supabase Pagination Queries
+**Learning:** Supabase allows fetching both the paginated data and the exact row count in a single query by adding `count="exact"` to the `.select("*", count="exact")` query. This avoids making an N+1 or redundant redundant query just to retrieve the pagination total. When fetching the `count`, we must robustly fallback using `result.count if hasattr(result, 'count') and result.count is not None else len(result.data)` since the `count` attribute might be missing if no data matches or for local mock objects.
+**Action:** Always combine the `count="exact"` with the primary data query when using Supabase for paginated lists instead of performing an extra roundtrip.
