@@ -56,7 +56,7 @@ export default function Error({
                     marginBottom: '2rem',
                     lineHeight: '1.6'
                 }}>
-                    We encountered an unexpected error. Don't worry, we're working on it!
+                    We encountered an unexpected error. Don&#39;t worry, we&#39;re working on it!
                 </p>
                 <button
                     onClick={reset}
