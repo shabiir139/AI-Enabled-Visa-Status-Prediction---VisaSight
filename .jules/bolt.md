@@ -1,0 +1,3 @@
+## 2024-06-25 - Supabase Exact Count Pagination Pattern
+**Learning:** Using `count='exact'` within a Supabase `.select()` query executes both the data retrieval and the exact count resolution in a single network round-trip via PostgREST. The python library exposes this under the `.count` attribute on the result object.
+**Action:** When implementing pagination with the Supabase client, always append `count='exact'` to the primary `select('*')` query to retrieve both paginated records and the total row count simultaneously, avoiding redundant N+1 query patterns. Handle the result robustly using `result.count if hasattr(result, 'count') and result.count is not None else len(result.data)`.
