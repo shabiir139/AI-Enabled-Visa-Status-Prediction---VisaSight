@@ -162,7 +162,7 @@ export default function LoginPage() {
                         </div>
 
                         <p className={styles.switchLink}>
-                            Don't have an account?{' '}
+                            Don&#39;t have an account?{' '}
                             <Link href="/auth/signup">Create one</Link>
                         </p>
                     </div>
