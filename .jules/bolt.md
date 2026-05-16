@@ -1,0 +1,3 @@
+## 2024-05-16 - Supabase Exact Count Pagination Pattern
+**Learning:** Supabase Python client's `.select('*', count='exact')` enables fetching data and row counts in a single network request, effectively solving the N+1 query pattern frequently seen in pagination implementations where developers manually query data then issue a second `count` request. This significantly reduces database round-trips for paginated endpoints.
+**Action:** Always combine data and count retrieval into a single `.select()` query when building paginated Supabase endpoints to halve the number of queries. Ensure fallback parsing for `result.count` handles unexpected missing attributes.
