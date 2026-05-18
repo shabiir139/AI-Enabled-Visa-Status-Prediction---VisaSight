@@ -1,0 +1,3 @@
+## 2024-05-24 - [Optimize Supabase Pagination]
+**Learning:** In Supabase, executing a separate count query to get the total number of rows alongside paginated data results in an unnecessary N+1 round-trip. You can append `count='exact'` to the initial `.select('*')` query to fetch both the paginated records and the total row count efficiently in a single request.
+**Action:** When implementing pagination with the Supabase client, always use the `count='exact'` parameter in the primary `.select()` method instead of executing a redundant count query to improve API response time and reduce database load.
