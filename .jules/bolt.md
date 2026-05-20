@@ -1,0 +1,3 @@
+## 2025-05-20 - [Supabase Single Round-Trip Pagination]
+**Learning:** Avoided redundant N+1 queries when paginating Supabase query results. Appending `count="exact"` to the primary `select("*")` query effectively fetches the paginated records alongside the total row count in one database call. Also implemented robust fallback `total = result.count if hasattr(result, 'count') and result.count is not None else len(result.data)` for count extraction.
+**Action:** Use `count="exact"` in `.select()` for all pagination queries that require a total count in Supabase to halve the number of queries executed.

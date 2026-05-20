@@ -35,8 +35,11 @@ export default function RulesPage() {
         }
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     React.useEffect(() => {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         fetchRules();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedType]);
 
     const getImpactLevel = (score: number) => {
