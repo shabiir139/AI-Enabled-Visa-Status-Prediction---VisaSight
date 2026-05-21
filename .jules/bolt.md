@@ -1,0 +1,3 @@
+## 2025-05-21 - [Supabase Pagination Optimization]
+**Learning:** In Supabase, executing a separate `count="exact"` query creates an N+1 query pattern that adds unnecessary database roundtrips. You can combine data fetching and exact row counting by appending `count="exact"` directly to the initial `select("*")` query, which retrieves both the paginated records and the total row count in a single round trip.
+**Action:** Always append `count="exact"` to the primary `select` query when implementing pagination with the Supabase client to improve API performance and reduce latency. Be sure to handle missing count attributes robustly.
