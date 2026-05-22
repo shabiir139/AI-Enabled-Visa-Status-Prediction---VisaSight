@@ -35,9 +35,11 @@ export default function RulesPage() {
         }
     };
 
+    /* eslint-disable react-hooks/exhaustive-deps */
     React.useEffect(() => {
         fetchRules();
     }, [selectedType]);
+    /* eslint-enable react-hooks/exhaustive-deps */
 
     const getImpactLevel = (score: number) => {
         if (score >= 4) return 'high';
