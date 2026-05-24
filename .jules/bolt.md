@@ -1,0 +1,3 @@
+## 2024-05-24 - Supabase Python Client N+1 Query Anti-Pattern
+**Learning:** Found a common anti-pattern where developers perform two database round-trips for paginated lists: one for the `select("*").range()` and another for `select("id", count="exact")`. The Supabase Python client allows combining these by passing `count="exact"` directly to the initial `select` method (e.g., `select("*", count="exact")`). This populates both `result.data` and `result.count` in a single request.
+**Action:** Always combine pagination data fetching and exact counting into a single query in Supabase endpoints to halve the latency and database load. Use a robust fallback to extract the count since the response object shape may vary or missing count attributes could crash the app.
