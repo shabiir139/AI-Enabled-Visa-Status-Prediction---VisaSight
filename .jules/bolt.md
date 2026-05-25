@@ -1,0 +1,3 @@
+## 2025-02-18 - Supabase Pagination Optimization
+**Learning:** Supabase Python client's `.select("*", count="exact")` correctly returns both paginated data and the total row count in a single database round-trip, significantly resolving N+1 queries. However, extracting the count requires defensively checking `hasattr(result, 'count') and result.count is not None` as the attribute availability can be volatile depending on the client version or query structure.
+**Action:** Next time optimizing Supabase lists, immediately check if `count="exact"` is combined with the primary query and use the defensive parsing pattern to extract the total safely.
