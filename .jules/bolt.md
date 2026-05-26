@@ -1,0 +1,3 @@
+## 2025-05-26 - Supabase Pagination Optimization
+**Learning:** Using `count="exact"` in the primary `.select("*", count="exact")` query fetches both the paginated records and the total row count in a single database round-trip, avoiding a redundant N+1 query pattern where a separate `.select("id", count="exact")` query is executed just to get the total count.
+**Action:** When implementing pagination with the Supabase client, always append `count='exact'` to the primary query. Parse the count from the response object robustly using a fallback pattern like `result.count if hasattr(result, 'count') and result.count is not None else len(result.data)`.
