@@ -1,0 +1,3 @@
+## 2024-05-24 - Supabase Pagination N+1 Query Fix
+**Learning:** The Supabase Python client can retrieve both paginated data and the exact total count in a single database round-trip by passing `count='exact'` to the primary `select("*")` query. This eliminates the need for a secondary N+1 count query, reducing latency for list endpoints.
+**Action:** Always append `count='exact'` to the primary `select("*")` query when implementing pagination with the Supabase client, and use a fallback pattern like `result.count if hasattr(result, 'count') and result.count is not None else len(result.data)` to handle the count extraction robustly.
