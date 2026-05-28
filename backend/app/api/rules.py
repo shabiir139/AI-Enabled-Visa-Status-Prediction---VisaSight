@@ -29,7 +29,9 @@ async def list_visa_rules(
 ):
     """List visa rules with optional filtering."""
     try:
-        query = supabase.table("visa_rules").select("*").eq("is_active", True)
+        # Use count="exact" to get both paginated data and total count in a single query
+        # This resolves the N+1 query performance bottleneck
+        query = supabase.table("visa_rules").select("*", count="exact").eq("is_active", True)
         
         if visa_type:
             query = query.eq("visa_type", visa_type)
@@ -43,6 +45,11 @@ async def list_visa_rules(
         
         result = query.execute()
         
+        # Extract total count from the main query result
+        total = getattr(result, 'count', None)
+        if total is None:
+            total = len(result.data)
+
         rules = [
             VisaRuleResponse(
                 id=row["id"],
@@ -57,15 +64,6 @@ async def list_visa_rules(
             )
             for row in result.data
         ]
-        
-        # Get total count
-        count_query = supabase.table("visa_rules").select("id", count="exact").eq("is_active", True)
-        if visa_type:
-            count_query = count_query.eq("visa_type", visa_type)
-        if category:
-            count_query = count_query.eq("rule_category", category)
-        count_result = count_query.execute()
-        total = count_result.count if hasattr(count_result, 'count') and count_result.count else len(result.data)
         
         return PaginatedResponse(
             items=rules,
