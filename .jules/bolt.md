@@ -1,0 +1,3 @@
+## 2023-10-27 - [Supabase Pagination Optimization]
+**Learning:** Avoid N+1 queries during Supabase pagination by appending `count="exact"` to the primary `select("*")` query to retrieve paginated records and total row counts in a single network round-trip, significantly lowering latency on high-traffic list endpoints.
+**Action:** When creating new APIs that return paginated data (e.g., `list_visa_cases`), use `select("*", count="exact")` instead of making a second `select("id", count="exact")` query. Note: use a safe fallback pattern like `result.count if hasattr(result, 'count') and result.count is not None else len(result.data)` since the `count` attribute might be missing if no data matches the query.
