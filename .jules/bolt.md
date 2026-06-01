@@ -1,0 +1,3 @@
+## 2024-05-24 - Supabase pagination N+1 query optimization
+**Learning:** Supabase Python client's `.select("*", count="exact")` combined with `.range()` allows fetching both the paginated page slice and the total total exact unpaginated count in a single database round-trip. This avoids a common N+1 performance bottleneck where total row counts are retrieved via a separate second query.
+**Action:** Always append `count='exact'` to the initial data query instead of creating a separate `select("id", count="exact")` query when implementing pagination with Supabase. Ensure proper parsing of the `count` attribute using `result.count if hasattr(result, 'count') and result.count is not None else len(result.data)`.
