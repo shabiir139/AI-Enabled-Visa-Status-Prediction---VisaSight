@@ -1,0 +1,3 @@
+## 2025-06-02 - Supabase Pagination Queries
+**Learning:** Pagination operations previously suffered from the N+1 query problem, requiring two separate round-trips to the database—one to fetch the paginated data and another to compute the total count. Supabase supports fetching both the data and the exact count in a single query by adding `count="exact"` to the primary query.
+**Action:** When implementing pagination with the Supabase client, always append `count="exact"` to the primary `select('*')` query to retrieve both paginated records and the total row count in a single database round-trip, halving database load and network latency.
