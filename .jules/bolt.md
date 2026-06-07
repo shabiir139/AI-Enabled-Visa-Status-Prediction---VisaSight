@@ -1,0 +1,3 @@
+## 2024-05-14 - Optimize Supabase Count Queries
+**Learning:** Supabase Python client's PostgREST integration allows appending `count="exact"` directly to the primary `select("*")` query to retrieve both the paginated records and the total row count in a single database round-trip. The backend correctly calculates this count while ignoring range/limit modifiers.
+**Action:** When implementing pagination with Supabase, use `select("*", count="exact")` instead of making a secondary `.select("id", count="exact")` query to avoid an N+1 query pattern and halve the database latency for list endpoints.

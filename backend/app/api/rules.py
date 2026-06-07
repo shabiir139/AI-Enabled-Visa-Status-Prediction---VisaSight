@@ -29,7 +29,9 @@ async def list_visa_rules(
 ):
     """List visa rules with optional filtering."""
     try:
-        query = supabase.table("visa_rules").select("*").eq("is_active", True)
+        # ⚡ Bolt Optimization: Fetch total count in the same round-trip
+        # Using count='exact' on the main query avoids N+1 database round-trips
+        query = supabase.table("visa_rules").select("*", count="exact").eq("is_active", True)
         
         if visa_type:
             query = query.eq("visa_type", visa_type)
@@ -58,14 +60,8 @@ async def list_visa_rules(
             for row in result.data
         ]
         
-        # Get total count
-        count_query = supabase.table("visa_rules").select("id", count="exact").eq("is_active", True)
-        if visa_type:
-            count_query = count_query.eq("visa_type", visa_type)
-        if category:
-            count_query = count_query.eq("rule_category", category)
-        count_result = count_query.execute()
-        total = count_result.count if hasattr(count_result, 'count') and count_result.count else len(result.data)
+        # ⚡ Bolt Optimization: Extract total from the single query result
+        total = result.count if hasattr(result, 'count') and result.count is not None else len(result.data)
         
         return PaginatedResponse(
             items=rules,
