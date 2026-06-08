@@ -1,0 +1,4 @@
+💡 What: Optimized the `list_visa_cases` pagination endpoint in `backend/app/api/cases.py` to fetch both paginated data and the exact total count in a single database round-trip by appending `count="exact"` to the primary query.
+🎯 Why: The previous implementation suffered from an N+1 query problem where a completely redundant second database query was executed solely to calculate the total row count, resulting in unnecessary database load and increased endpoint latency.
+📊 Impact: Reduces database queries per pagination request by 50% (from 2 queries to 1), decreasing database connection overhead and improving endpoint response times.
+🔬 Measurement: Verify by executing the `GET /api/cases` endpoint and observing the network latency, or by profiling the Supabase database logs to confirm only one SQL `SELECT` operation is performed per request instead of two. Also includes frontend linting fixes to satisfy Next.js ESLint requirements.
