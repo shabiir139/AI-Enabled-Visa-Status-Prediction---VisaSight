@@ -1,0 +1,3 @@
+## 2024-06-12 - Fix N+1 pagination query in Supabase calls
+**Learning:** Using `count='exact'` in a separate query to fetch the total row count alongside paginated data results in an unnecessary N+1 round-trip. Supabase allows appending `count='exact'` to the main data fetch (e.g., `select('*', count='exact')`), correctly returning both the limited/paginated data and the total dataset count (respecting filters but ignoring range/limits).
+**Action:** Always append `count='exact'` to the primary `select` query when implementing pagination with Supabase to avoid redundant database calls. Extract the count from `result.count` or fallback to `len(result.data)` if missing.
