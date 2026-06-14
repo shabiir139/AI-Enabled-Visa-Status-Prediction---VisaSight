@@ -1,0 +1,3 @@
+## 2024-05-24 - Combine Supabase pagination and count queries
+**Learning:** Supabase Python client can fetch both paginated data and the exact total count in a single query by appending `count="exact"` to the primary `select("*", count="exact")` query. This avoids a redundant N+1 query and prevents bugs where filters applied to the main query are accidentally omitted from the separate count query. PostgREST handles the count calculation correctly based on filters while ignoring range limits.
+**Action:** Always append `count="exact"` to the main `select` statement when implementing pagination with Supabase to save a database roundtrip, then access `result.count` and fallback to `len(result.data)` if needed.
