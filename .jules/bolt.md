@@ -1,0 +1,3 @@
+## 2024-06-11 - Combine Supabase pagination queries
+**Learning:** Supabase / PostgREST can return both paginated data and the exact total count in a single network request by adding `count='exact'` to the main `select()` call, rather than executing a separate `count` query. PostgREST handles the count correctly without being affected by range modifiers.
+**Action:** When implementing pagination with Supabase, always use `.select("*", count="exact")` to retrieve data and total count simultaneously, preventing redundant database round-trips. Handle the returned count carefully via `result.count if hasattr(result, 'count') and result.count is not None else len(result.data)`.
