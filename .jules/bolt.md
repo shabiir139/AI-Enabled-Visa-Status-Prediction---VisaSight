@@ -1,0 +1,3 @@
+## 2024-06-23 - Supabase Pagination Optimization
+**Learning:** Supabase / PostgREST supports retrieving both paginated records and the exact total row count in a single database round-trip by appending `count="exact"` to the primary `select("*")` query. The total can then be extracted via `result.count`. This avoids a redundant N+1 query and prevents bugs where filters might be accidentally omitted from a separate count query.
+**Action:** When implementing pagination with the Supabase client, always use `count="exact"` on the primary data fetch instead of performing a separate count query, and extract it safely using `result.count if hasattr(result, "count") and result.count is not None else len(result.data)`.
