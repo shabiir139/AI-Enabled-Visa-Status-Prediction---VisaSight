@@ -1,0 +1,3 @@
+## 2024-06-27 - Optimize Supabase Pagination Queries
+**Learning:** PostgREST and the Supabase Python client support `count='exact'` modifier on `select()` queries. This calculates the total count based on applied filters but ignores range/limit modifiers, allowing you to fetch paginated data and the exact total row count in a single database round-trip without needing an entirely separate counting query.
+**Action:** When implementing pagination with Supabase, append `count='exact'` to the main `select()` call and extract the `count` attribute from the result object rather than performing a separate query. Add a fallback to `len(result.data)` if the count is `None`.
