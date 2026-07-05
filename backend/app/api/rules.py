@@ -29,7 +29,9 @@ async def list_visa_rules(
 ):
     """List visa rules with optional filtering."""
     try:
-        query = supabase.table("visa_rules").select("*").eq("is_active", True)
+        # Bolt Performance Optimization: Combine data query and exact count into a single request
+        # to avoid N+1 queries and duplicate filter definitions.
+        query = supabase.table("visa_rules").select("*", count="exact").eq("is_active", True)
         
         if visa_type:
             query = query.eq("visa_type", visa_type)
@@ -43,6 +45,9 @@ async def list_visa_rules(
         
         result = query.execute()
         
+        # Get total count directly from the paginated result
+        total = result.count if hasattr(result, 'count') and result.count is not None else len(result.data)
+
         rules = [
             VisaRuleResponse(
                 id=row["id"],
@@ -57,15 +62,6 @@ async def list_visa_rules(
             )
             for row in result.data
         ]
-        
-        # Get total count
-        count_query = supabase.table("visa_rules").select("id", count="exact").eq("is_active", True)
-        if visa_type:
-            count_query = count_query.eq("visa_type", visa_type)
-        if category:
-            count_query = count_query.eq("rule_category", category)
-        count_result = count_query.execute()
-        total = count_result.count if hasattr(count_result, 'count') and count_result.count else len(result.data)
         
         return PaginatedResponse(
             items=rules,
