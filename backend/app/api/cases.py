@@ -120,9 +120,7 @@ async def list_visa_cases(
     user_id = get_user_id_from_token(authorization)
     
     try:
-        # ⚡ Bolt Optimization: Added count='exact' to single query to eliminate N+1 pagination queries
-        # Expected Impact: Cuts database round-trips from two to one, reducing latency by ~50%
-        query = supabase.table("visa_cases").select("*", count="exact")
+        query = supabase.table("visa_cases").select("*")
         
         if user_id:
             query = query.eq("user_id", user_id)
@@ -134,8 +132,12 @@ async def list_visa_cases(
         
         result = query.execute()
         
-        # Extract total from the primary query result
-        total = result.count if hasattr(result, 'count') and result.count is not None else len(result.data)
+        # Get total count
+        count_result = supabase.table("visa_cases").select("id", count="exact")
+        if user_id:
+            count_result = count_result.eq("user_id", user_id)
+        count_data = count_result.execute()
+        total = count_data.count if hasattr(count_data, 'count') else len(result.data)
         
         cases = [
             VisaCaseResponse(
