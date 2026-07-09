@@ -12,7 +12,10 @@ interface StatsCardProps {
     variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger';
 }
 
-export default function StatsCard({ title, value, subtitle, icon, trend, variant = 'default' }: StatsCardProps) {
+// ⚡ Bolt: Wrapped with React.memo to prevent unnecessary re-renders when parent dashboard components
+// update states that don't affect this purely presentational component.
+// Expected Impact: Eliminates redundant DOM diffing for stats cards during frequent parent re-renders.
+const StatsCard = React.memo(function StatsCard({ title, value, subtitle, icon, trend, variant = 'default' }: StatsCardProps) {
     return (
         <div className={`${styles.card} ${styles[variant]}`}>
             <div className={styles.iconContainer}>{icon}</div>
@@ -29,4 +32,6 @@ export default function StatsCard({ title, value, subtitle, icon, trend, variant
             </div>
         </div>
     );
-}
+});
+
+export default StatsCard;
