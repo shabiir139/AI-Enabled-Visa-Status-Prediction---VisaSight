@@ -37,7 +37,7 @@ export default function RulesPage() {
 
     React.useEffect(() => {
         fetchRules();
-    }, [selectedType]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [selectedType]);
 
     const getImpactLevel = (score: number) => {
         if (score >= 4) return 'high';
