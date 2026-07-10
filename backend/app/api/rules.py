@@ -66,7 +66,7 @@ async def list_visa_rules(
             count_query = count_query.eq("rule_category", category)
         count_result = count_query.execute()
         total = count_result.count if hasattr(count_result, 'count') and count_result.count else len(result.data)
-        
+
         return PaginatedResponse(
             items=rules,
             total=total,
