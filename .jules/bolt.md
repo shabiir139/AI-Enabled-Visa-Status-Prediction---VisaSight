@@ -1,0 +1,3 @@
+## 2024-07-12 - Supabase Pagination Optimization
+**Learning:** In Supabase, retrieving paginated records and their total count in separate queries can be inefficient and risks mismatching data if filters are complex or not synchronized between queries. By appending `count="exact"` to the primary `select("*")` query, PostgREST calculates the total based on applied filters while ignoring range/limit modifiers, fetching both the data and the exact total count in a single database round-trip.
+**Action:** Always append `count="exact"` to the primary query when paginating with the Supabase Python client and access the count via `result.count` to avoid redundant N+1 queries.
