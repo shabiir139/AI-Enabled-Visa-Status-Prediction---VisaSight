@@ -54,7 +54,7 @@ export default function NotFound() {
                 }}>
                     Sorry, we couldn&apos;t find the page you&apos;re looking for.
                     <br />
-                    It might have been moved or doesn&apos;t exist. or deleted.
+                    It might have been moved or deleted.
                 </p>
                 <div style={{
                     display: 'flex',
