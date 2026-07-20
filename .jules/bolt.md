@@ -1,0 +1,3 @@
+## 2025-02-14 - Supabase Single Round-Trip Pagination
+**Learning:** Supabase Python client's PostgREST API supports fetching data and total count simultaneously using `select("*", count="exact")`. The exact count takes into account applied filters but ignores range offsets and limits, avoiding the need for a separate `.select("id", count="exact")` query and manually reapplying all filters.
+**Action:** When implementing pagination with the Supabase client, always use `count="exact"` on the primary data query to halve database round-trips and prevent filter-syncing bugs between data and count queries.
