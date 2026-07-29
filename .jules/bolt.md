@@ -1,0 +1,3 @@
+## 2024-07-29 - Supabase Pagination Round-Trips
+**Learning:** When using the Supabase client for pagination, executing a separate count query (e.g., `count="exact"`) after the main query causes redundant N+1 database round-trips. PostgREST correctly calculates the total count based on applied filters while ignoring range/limit modifiers when `count="exact"` is appended directly to the primary `select('*', count='exact')` query.
+**Action:** Always append `count='exact'` to the primary `select` query when both data and total counts are needed, accessing the total via `result.count if hasattr(result, 'count') and result.count is not None else len(result.data)` to optimize performance and prevent accidental omission of filters.
