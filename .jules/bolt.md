@@ -1,0 +1,3 @@
+## 2024-08-04 - [Single Round-Trip Supabase Pagination]
+**Learning:** PostgREST/Supabase supports retrieving paginated data alongside the exact total row count in a single query by appending `count="exact"` to the primary `select("*")` statement. It properly calculates the total based on applied filters but ignores range limits, thus solving N+1 query bottlenecks efficiently.
+**Action:** When implementing pagination using the Supabase client, always combine the data fetch and total count retrieval into a single query to eliminate redundant database round-trips and prevent filter divergence bugs.
