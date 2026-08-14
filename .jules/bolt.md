@@ -1,0 +1,3 @@
+## 2025-08-14 - Optimize Supabase Pagination Count Queries
+**Learning:** Supabase Python client can fetch paginated data and the exact total record count in a single database round-trip by appending `count='exact'` to the initial `select('*')` query. This eliminates the need for a secondary N+1 query solely to retrieve the count. PostgREST handles the count calculation against the base query filters, ignoring pagination range modifiers.
+**Action:** When implementing pagination with Supabase, use a single unified query with `select('*', count='exact')` and extract `total = result.count if hasattr(result, 'count') and result.count is not None else len(result.data)` rather than duplicating filters in a separate count query.
