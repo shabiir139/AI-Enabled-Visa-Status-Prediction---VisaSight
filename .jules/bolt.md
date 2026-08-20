@@ -1,0 +1,3 @@
+## 2025-02-23 - Supabase N+1 Pagination Optimization
+**Learning:** Supabase Python client's `select('*', count='exact')` enables retrieving both the total count of a query and the paginated results in a single round-trip database query. Previous implementations incorrectly fetched the items with one query, and then created a separate copy of the query just to get the count.
+**Action:** Always append `count='exact'` to the initial `select()` call and read from `result.count` when building paginated endpoints, rather than executing two separate queries. This keeps query filters in sync and significantly reduces database load and API latency.
