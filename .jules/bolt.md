@@ -1,0 +1,6 @@
+## 2025-08-23 - [Initial Bolt Setup]
+**Learning:** Checking the memory instructions for Supabase integrations. Memory says: "When implementing pagination with the Supabase client, append `count='exact'` to the primary `select('*')` query to retrieve both paginated records and the total row count in a single database round-trip. This avoids redundant N+1 queries and prevents bugs where filters are accidentally omitted from a separate count query. PostgREST correctly calculates the total based on applied filters while ignoring range/limit modifiers."
+**Action:** I will apply this optimization to backend/app/api/cases.py and backend/app/api/rules.py where pagination is used.
+## 2026-08-23 - [GitHub CI Fix]
+**Learning:** Found an error where CI was failing because the `working-directory` and `cache-dependency-path` were incorrectly set to `./visasight/frontend` and `./visasight/backend` instead of `./frontend` and `./backend`. This caused "unable to cache dependencies" and "No such file or directory" errors during setup-node and bash runs. Also, upgraded Node.js from `20.x` to `22.x` to resolve deprecation warnings.
+**Action:** When updating CI workflows, ensure path settings like `working-directory` and `cache-dependency-path` align with the actual repo structure, and prioritize upgrading Node version to avoid runtime warnings.
