@@ -1,0 +1,3 @@
+## 2025-08-23 - [Initial Bolt Setup]
+**Learning:** Checking the memory instructions for Supabase integrations. Memory says: "When implementing pagination with the Supabase client, append `count='exact'` to the primary `select('*')` query to retrieve both paginated records and the total row count in a single database round-trip. This avoids redundant N+1 queries and prevents bugs where filters are accidentally omitted from a separate count query. PostgREST correctly calculates the total based on applied filters while ignoring range/limit modifiers."
+**Action:** I will apply this optimization to backend/app/api/cases.py and backend/app/api/rules.py where pagination is used.
