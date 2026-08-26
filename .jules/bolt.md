@@ -1,0 +1,3 @@
+## 2024-08-26 - Backend Supabase Count Queries Optimization
+**Learning:** The Supabase python client does two separate round-trips for fetching paginated items and the total count. `result = query.execute()` and `count_result = count_query.execute()`. This creates an N+1 query problem, increasing latency for list endpoints.
+**Action:** When implementing pagination with the Supabase client, append `count='exact'` to the primary `select('*')` query to retrieve both paginated records and the total row count in a single database round-trip. PostgREST correctly calculates the total based on applied filters while ignoring range/limit modifiers.
