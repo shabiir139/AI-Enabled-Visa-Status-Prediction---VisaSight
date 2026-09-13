@@ -1,0 +1,3 @@
+## 2024-05-18 - Supabase N+1 Count Optimization
+**Learning:** In Supabase, retrieving paginated records and calculating the exact count using separate queries (an N+1 pattern) is inefficient. The Supabase Python client supports appending `count='exact'` to the primary `select('*')` query to retrieve both paginated records and the total row count in a single database round-trip. PostgREST handles calculating the total based on applied filters while ignoring range/limit modifiers.
+**Action:** Always combine the total count calculation into the main query when paginating data via the Supabase client using `.select("*", count="exact")`.
