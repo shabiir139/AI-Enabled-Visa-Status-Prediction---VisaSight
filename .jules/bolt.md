@@ -1,0 +1,3 @@
+## 2024-09-14 - Optimize Supabase Pagination Queries
+**Learning:** In Supabase, executing a separate count query for pagination causes an unnecessary database round-trip (N+1 query pattern). PostgREST supports retrieving both the paginated data and the total row count in a single request by appending `count='exact'` to the main `select()` call. It properly calculates the total count based on filters while ignoring range/limit modifiers.
+**Action:** Always append `count='exact'` to the primary `select` query when implementing pagination in Supabase to eliminate redundant count queries and ensure filters are consistently applied to both the data and the total count.
