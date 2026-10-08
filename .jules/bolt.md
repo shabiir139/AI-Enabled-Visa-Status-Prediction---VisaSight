@@ -1,0 +1,3 @@
+## 2024-10-08 - Supabase Pagination Optimization
+**Learning:** PostgREST API (used by Supabase) correctly calculates the total number of records matching applied filters even when range/limit modifiers are used. Performing a separate query just to fetch the total count (`select('id', count='exact')`) causes a redundant query issue, doubling database roundtrips per paginated endpoint hit.
+**Action:** Always append `count='exact'` to the primary `select('*')` query to retrieve both paginated records and the total row count in a single database round-trip. Access the total via `result.count if hasattr(result, 'count') and result.count is not None else len(result.data)`.
