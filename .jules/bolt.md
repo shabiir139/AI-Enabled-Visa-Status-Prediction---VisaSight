@@ -1,0 +1,3 @@
+## 2025-02-18 - Supabase Pagination Optimization (N+1 Query Issue)
+**Learning:** Found N+1 query issue in Supabase pagination where two separate database trips are being made (one for data, one for count). This is a backend performance bottleneck specific to how we're using the python supabase client.
+**Action:** When implementing pagination with the Supabase client, append `count='exact'` to the primary `select('*')` query to retrieve both paginated records and the total row count in a single database round-trip. This avoids redundant N+1 queries and prevents bugs where filters are accidentally omitted from a separate count query. PostgREST correctly calculates the total based on applied filters while ignoring range/limit modifiers.
