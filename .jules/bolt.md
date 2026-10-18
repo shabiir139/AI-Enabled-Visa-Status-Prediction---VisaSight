@@ -1,0 +1,3 @@
+## 2024-10-18 - [Optimize Supabase Pagination]
+**Learning:** Supabase Python client allows fetching data and exact count in a single query by appending `count='exact'` to the initial `select('*')` query, which calculates total rows based on applied filters while ignoring range limits. This avoids a redundant second query to fetch total count, saving a database roundtrip on list endpoints.
+**Action:** Apply `select('*', count='exact')` pattern instead of separating paginated requests from total row count requests when interacting with Supabase to improve query latency and avoid duplicated database calls. Ensure to retrieve count properly from `result.count if hasattr(result, 'count') and result.count is not None`.
