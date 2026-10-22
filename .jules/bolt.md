@@ -1,0 +1,4 @@
+
+## 2025-02-12 - Supabase Pagination Optimization (N+1 Query Issue)
+**Learning:** In Supabase/PostgREST, when implementing pagination, making two separate queries—one for the data `select("*")` and one for the total count `select("id", count="exact")`—is an anti-pattern. This results in a redundant N+1 query scenario, causing two database round-trips when one would suffice. The correct approach is to append `count="exact"` to the primary data query `select("*", count="exact")`. PostgREST calculates the total based on applied filters while ignoring range/limit modifiers, returning both paginated records and the total row count in a single response, which halves database latency for list endpoints.
+**Action:** Always append `count="exact"` to the primary `select` query when both data and total count are required for pagination, and extract the count from the `result.count` attribute.
