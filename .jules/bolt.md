@@ -1,0 +1,3 @@
+## 2025-01-20 - N+1 Supabase Pagination Queries
+**Learning:** In Supabase pagination, executing a `select('*')` query to get items and a separate `select('id', count='exact')` query to get the total count is an N+1 query anti-pattern and introduces an extra database round trip. PostgREST allows calculating the exact count based on filters in the same query by specifying `count='exact'` on the primary `select` query while also paginating, ignoring the `limit` / `range` modifiers when computing the count.
+**Action:** Always append `count='exact'` to the initial `select('*')` query when retrieving paginated items from Supabase, then extract the total count and the paginated items from the single response to improve performance by halving database latency.
