@@ -1,0 +1,3 @@
+## 2025-01-20 - N+1 query optimization in Supabase python client
+**Learning:** The Supabase Python client supports querying data and extracting the exact row count in a single roundtrip via PostgREST by using `count="exact"` in the primary `select` query (e.g., `supabase.table('table').select('*', count='exact')`). However, handling the total extraction needs care: access it via `result.count if hasattr(result, 'count') and result.count is not None else len(result.data)`.
+**Action:** Always combine pagination data fetches with count extraction in a single query to eliminate redundant N+1 database roundtrips.
