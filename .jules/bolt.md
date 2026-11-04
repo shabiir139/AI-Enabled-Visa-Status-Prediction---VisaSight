@@ -1,0 +1,3 @@
+## 2024-03-24 - Supabase Pagination Optimization
+**Learning:** Supabase / PostgREST supports retrieving exact counts alongside the primary query by using `select('*', count='exact')`. This avoids needing to make a completely separate query just for the count when paginating results. PostgREST calculates the exact row count in a single round-trip, ignoring range modifiers.
+**Action:** Replace two distinct DB queries (one for data, one for count) with a single `count='exact'` query in `backend/app/api/cases.py` and `backend/app/api/rules.py` to optimize DB roundtrips and improve backend latency.
